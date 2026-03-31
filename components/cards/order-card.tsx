@@ -1,154 +1,196 @@
-import { Image, StyleSheet, Text, View } from 'react-native';
-import ButtonRN from '../ui/button';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { router, useSegments } from 'expo-router';
-import { BadgeCheck } from 'lucide-react-native';
 
 interface GigItem {
-    orderId: string;
-    image: string;
-    title: string;
-    description: string;
-    status: string;
-    price: string;
+    id: number;
+    gigsID: number;
+    gigsTitle: string;
+    gigsDescription: string;
     gigsImage: string;
     base_price: string;
+    status: string;
+    package_type: string;
+    created_at: string;
 }
 
-interface card {
+interface CardProps {
     item: GigItem;
-    handleClickComplete: () => void
+    handleClickComplete: () => void;
 }
 
-export default function OrderCard({ item, handleClickComplete }: card) {
+function getStatusConfig(status: string) {
+    const s = status?.toLowerCase();
+    if (s === 'completed') return {
+        label: 'Completed',
+        badgeBg: '#f0fdf4',
+        dotColor: '#16a34a',
+        textColor: '#15803d',
+    };
+    if (s === 'paid' || s === 'in progress' || s === 'inprogress') return {
+        label: s === 'paid' ? 'Paid' : 'In Progress',
+        badgeBg: '#fffbeb',
+        dotColor: '#d97706',
+        textColor: '#b45309',
+    };
+    return {
+        label: status ?? 'Pending',
+        badgeBg: '#f5f3ff',
+        dotColor: '#7c3aed',
+        textColor: '#6d28d9',
+    };
+}
 
-    const segmants = useSegments()
-    const route = segmants.includes('(client)') ? `/client-order-detail/${item.orderId}}` : `/freelancer-order-detail/${item.id}}`
-    
+function formatDate(dateStr: string) {
+    if (!dateStr) return '—';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+export default function OrderCard({ item, handleClickComplete }: CardProps) {
+    const segments = useSegments();
+    const cfg = getStatusConfig(item.status);
+
+    const route = segments.includes('(client)')
+        ? `/client-order-detail/${item.id}`
+        : `/freelancer-order-detail/${item.id}`;
+
     return (
-        <View style={styles.container}>
-            <View style={styles.card}>
-                <Image source={{ uri: item?.gigsImage?.split(",")[0] }} style={styles.image} />
-                <View style={styles.content}>
-                    <Text numberOfLines={2} style={styles.title}>{item.title}</Text>
-                    {/* <Text style={styles.desc}>{item.description}</Text> */}
-                    <View style={styles.row}>
+        <View style={styles.card}>
+            <View style={styles.cardBody}>
+                <Image
+                    source={{ uri: item?.gigsImage?.split(',')[0] }}
+                    style={styles.thumb}
+                    resizeMode="cover"
+                />
+                <View style={styles.info}>
+                    <View style={styles.topRow}>
+                        <Text numberOfLines={2} style={styles.title}>{item.gigsTitle}</Text>
+                        <Text style={styles.orderId}>#{item.id}</Text>
                     </View>
-                    <View style={styles.right}>
-                        <View style={styles.status}>
-                            <BadgeCheck color="#16A34A" size="20"/>
-                            <Text style={styles.statusText}>{item.status}</Text>
+                    <Text style={styles.price}>${item.base_price}</Text>
+                    <View style={styles.bottomRow}>
+                        <View style={[styles.badge, { backgroundColor: cfg.badgeBg }]}>
+                            <View style={[styles.dot, { backgroundColor: cfg.dotColor }]} />
+                            <Text style={[styles.badgeText, { color: cfg.textColor }]}>
+                                {cfg.label}
+                            </Text>
                         </View>
-                        <Text style={styles.price}>Price: {item.base_price}</Text>
                     </View>
                 </View>
             </View>
-            {/* <View style={styles.buttonContainer}>
-                <ButtonRN style={styles.button} handleClick={() => router.push(route)}>
-                    View Details
-                </ButtonRN>
-                <ButtonRN handleClick={handleClickComplete} style={styles.button}>
-                    Complete Order
-                </ButtonRN>
-            </View> */}
+
+            <View style={styles.divider} />
+
+            <View style={styles.footer}>
+                <Text style={styles.footerLabel}>
+                    Ordered <Text style={styles.footerMeta}>{formatDate(item.created_at)}</Text>
+                </Text>
+                <TouchableOpacity onPress={() => router.push(route)} activeOpacity={0.6}>
+                    <Text style={styles.detailBtn}>See details →</Text>
+                </TouchableOpacity>
+            </View>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        padding: 12,
-        borderRadius: 14,
-        // borderColor: '#15A9B2',
-        // borderWidth: 1,
-        backgroundColor: '#FFFFFF'
-    },
     card: {
+        backgroundColor: '#ffffff',
+        borderRadius: 16,
+        borderWidth: 0.5,
+        borderColor: '#e5e7eb',
+        overflow: 'hidden',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+        elevation: 2,
+    },
+    cardBody: {
         flexDirection: 'row',
-        marginBottom: 14,
-        elevation: 3,
     },
-    image: {
-        width: 120,
-        height: 82,
-        borderRadius: 10,
-        marginRight: 12,
+    thumb: {
+        width: 108,
+        height: 108,
+        flexShrink: 0,
     },
-    content: {
+    info: {
         flex: 1,
-    },
-    title: {
-        fontSize: 13,
-        fontWeight: '600',
-    },
-    desc: {
-        fontSize: 10,
-        color: '#6B7280',
-        marginVertical: 2,
-        width: 150
-    },
-    row: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 6,
-    },
-    status: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#ECFDF5',
-        paddingHorizontal: 8,
-        paddingVertical: 5,
-        borderRadius: 20,
-        marginRight: 8,
-        marginTop: 14
-    },
-    statusText: {
-        fontSize: 11,
-        marginLeft: 4,
-        color: '#16A34A',
-        textTransform: "capitalize"
-    },
-    button: {
-        flex: 1
-    },
-    buttonText: {
-        fontSize: 11,
-    },
-    right: {
-        display: "flex",
-        flexDirection: "row",
-        alignItems: 'flex-end',
+        paddingHorizontal: 14,
+        paddingTop: 14,
+        paddingBottom: 12,
         justifyContent: 'space-between',
     },
+    topRow: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        gap: 8,
+    },
+    title: {
+        flex: 1,
+        fontSize: 13,
+        fontWeight: '500',
+        color: '#111827',
+        lineHeight: 19,
+    },
+    orderId: {
+        fontSize: 10,
+        color: '#9ca3af',
+        paddingTop: 2,
+        flexShrink: 0,
+    },
     price: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#0d7c85',
+        marginTop: 6,
+        letterSpacing: -0.3,
+    },
+    bottomRow: {
+        marginTop: 8,
+    },
+    badge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        alignSelf: 'flex-start',
+        gap: 5,
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 6,
+    },
+    dot: {
+        width: 5,
+        height: 5,
+        borderRadius: 3,
+    },
+    badgeText: {
+        fontSize: 11,
+        fontWeight: '500',
+    },
+    divider: {
+        height: 0.5,
+        backgroundColor: '#f3f4f6',
+        marginHorizontal: 14,
+    },
+    footer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 14,
+        paddingVertical: 10,
+    },
+    footerLabel: {
+        fontSize: 11,
+        color: '#9ca3af',
+    },
+    footerMeta: {
         fontSize: 11,
         color: '#374151',
-        marginBottom: 4,
-        fontWeight: 700
+        fontWeight: '500',
     },
-    dropdown: {
-        position: 'absolute',
-        top: 26,
-        right: 0,
-        width: 140,
-        backgroundColor: '#fff',
-        borderRadius: 10,
-        elevation: 6,
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowRadius: 10,
-    },
-    menuItem: {
-        paddingVertical: 10,
-        paddingHorizontal: 12,
-    },
-    menuText: {
+    detailBtn: {
         fontSize: 12,
-        color: '#111827',
+        fontWeight: '500',
+        color: '#0d7c85',
     },
-    buttonContainer: {
-        flex: 1,
-        display: "flex",
-        flexDirection: "row",
-        gap: 8,
-    }
 });

@@ -4,14 +4,21 @@ import ProductSlider from "@/components/order-detail/product-slider";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useLocalSearchParams } from "expo-router";
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, Animated } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ICCDLoader from '@/components/ui/loader2';
 import { Ionicons } from '@expo/vector-icons';
+import { ArrowLeft, MessageCircle } from 'lucide-react-native';
 import { useEffect, useRef } from 'react';
+
+const ACCENT = '#0d9488';
+const BORDER = 'rgba(14,165,233,0.18)';
+const TEXT_PRIMARY = '#0f172a';
+const TEXT_SECONDARY = '#6b7280';
 
 const GigDetail = () => {
   const { id } = useLocalSearchParams();
   const { data, isLoading } = useGetSingleGigs(id);
+  const insets = useSafeAreaInsets();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
 
@@ -35,17 +42,17 @@ const GigDetail = () => {
   const { freelancerDetails, gigsDescription, packagesDetails } = data[0];
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <ScrollView 
-        contentContainerStyle={styles.scrollContent} 
+    <View style={styles.container}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         bounces={true}
       >
-        {/* Hero Section with Gradient Overlay */}
+        {/* Hero */}
         <View style={styles.heroSection}>
-          <ProductSlider images={gigsDescription?.gigsFiles?.split(",") || []} />
+          <ProductSlider images={gigsDescription?.gigsFiles?.split(',') || []} />
           <LinearGradient
-            colors={['transparent', 'rgba(0,0,0,0.7)']}
+            colors={['transparent', 'rgba(9,30,39,0.88)']}
             style={styles.heroGradient}
           >
             <View style={styles.heroContent}>
@@ -55,138 +62,156 @@ const GigDetail = () => {
                   style={styles.chipAvatar}
                 />
                 <Text style={styles.chipName}>{freelancerDetails?.freelancerName}</Text>
-                <View style={styles.verifiedBadge}>
-                  <Ionicons name="checkmark-circle" size={16} color="#10b981" />
-                </View>
+                <Ionicons name="checkmark-circle" size={15} color="#10b981" />
               </View>
               <Text style={styles.heroTitle}>{gigsDescription?.gigsTitle}</Text>
             </View>
           </LinearGradient>
+
+          {/* Back button */}
+          {/* <TouchableOpacity
+            style={[styles.backBtn, { top: insets.top + 10 }]}
+            onPress={() => router.back()}
+          >
+            <ArrowLeft size={20} color="#fff" />
+          </TouchableOpacity> */}
         </View>
 
-        <Animated.View 
-          style={[
-            styles.contentContainer,
-            {
-              opacity: fadeAnim,
-              transform: [{ translateY: slideAnim }],
-            },
-          ]}
+        {/* Body */}
+        <LinearGradient
+          colors={['#f0f9ff', '#e0f2fe', '#bae6fd', '#7dd3fc']}
+          style={styles.bodyGradient}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0.6, y: 1 }}
         >
-          {/* Quick Stats */}
-          <View style={styles.statsContainer}>
-            <View style={styles.statBox}>
-              <Ionicons name="star" size={20} color="#fbbf24" />
-              <Text style={styles.statValue}>4.9</Text>
-              <Text style={styles.statLabel}>Rating</Text>
-            </View>
-            <View style={styles.statDivider} />
-            <View style={styles.statBox}>
-              <Ionicons name="briefcase-outline" size={20} color="#147D7E" />
-              <Text style={styles.statValue}>127</Text>
-              <Text style={styles.statLabel}>Orders</Text>
-            </View>
-            <View style={styles.statDivider} />
-            <View style={styles.statBox}>
-              <Ionicons name="time-outline" size={20} color="#147D7E" />
-              <Text style={styles.statValue}>2 Days</Text>
-              <Text style={styles.statLabel}>Delivery</Text>
-            </View>
-          </View>
-
-          {/* About Section */}
-          <View style={styles.sectionContainer}>
-            <View style={styles.sectionHeader}>
-              <View style={styles.sectionIconBox}>
-                <Ionicons name="information-circle" size={20} color="#147D7E" />
+          <Animated.View
+            style={[
+              styles.contentContainer,
+              {
+                opacity: fadeAnim,
+                transform: [{ translateY: slideAnim }],
+              },
+            ]}
+          >
+            {/* Stats */}
+            <View style={styles.statsContainer}>
+              <View style={styles.statBox}>
+                <Ionicons name="star" size={20} color="#fbbf24" />
+                <Text style={styles.statValue}>4.9</Text>
+                <Text style={styles.statLabel}>Rating</Text>
               </View>
-              <Text style={styles.sectionTitle}>About This Gig</Text>
-            </View>
-            <View style={styles.descriptionCard}>
-              <Text style={styles.descriptionText}>{gigsDescription?.gigsDescription}</Text>
-            </View>
-          </View>
-
-          {/* Freelancer Profile */}
-          <View style={styles.sectionContainer}>
-            <View style={styles.sectionHeader}>
-              <View style={styles.sectionIconBox}>
-                <Ionicons name="person" size={20} color="#147D7E" />
+              <View style={styles.statDivider} />
+              <View style={styles.statBox}>
+                <Ionicons name="briefcase-outline" size={20} color={ACCENT} />
+                <Text style={styles.statValue}>127</Text>
+                <Text style={styles.statLabel}>Orders</Text>
               </View>
-              <Text style={styles.sectionTitle}>Meet Your Freelancer</Text>
-            </View>
-            <View style={styles.freelancerCard}>
-              <Image
-                source={{ uri: freelancerDetails?.freelancerPic }}
-                style={styles.freelancerImage}
-              />
-              <View style={styles.freelancerInfo}>
-                <Text style={styles.freelancerName}>{freelancerDetails?.freelancerName}</Text>
-                <Text style={styles.freelancerBio} numberOfLines={3}>
-                  {freelancerDetails?.professionalSummary}
-                </Text>
-                <TouchableOpacity style={styles.viewProfileBtn}>
-                  <Text style={styles.viewProfileText}>View Full Profile</Text>
-                  <Ionicons name="arrow-forward" size={14} color="#147D7E" />
-                </TouchableOpacity>
+              <View style={styles.statDivider} />
+              <View style={styles.statBox}>
+                <Ionicons name="time-outline" size={20} color={ACCENT} />
+                <Text style={styles.statValue}>2 Days</Text>
+                <Text style={styles.statLabel}>Delivery</Text>
               </View>
             </View>
-          </View>
 
-          {/* Pricing */}
-          <View style={styles.sectionContainer}>
-            <View style={styles.sectionHeader}>
-              <View style={styles.sectionIconBox}>
-                <Ionicons name="pricetag" size={20} color="#147D7E" />
+            {/* About */}
+            <View style={styles.sectionContainer}>
+              <View style={styles.sectionHeader}>
+                <View style={styles.sectionIconBox}>
+                  <Ionicons name="information-circle" size={20} color={ACCENT} />
+                </View>
+                <Text style={styles.sectionTitle}>About This Gig</Text>
               </View>
-              <Text style={styles.sectionTitle}>Choose Your Package</Text>
+              <View style={styles.card}>
+                <Text style={styles.descriptionText}>{gigsDescription?.gigsDescription}</Text>
+              </View>
             </View>
-            <GigPricing packagesDetails={packagesDetails} />
-          </View>
 
-          {/* Action Buttons */}
-          <View style={styles.actionSection}>
-            <TouchableOpacity 
-              onPress={() => router.push('/gig-detail/order-detail')} 
-              activeOpacity={0.85}
-              style={styles.primaryBtnWrapper}
-            >
-              <LinearGradient
-                colors={["#147D7E", "#0f5f60"]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.primaryBtn}
+            {/* Freelancer */}
+            <View style={styles.sectionContainer}>
+              <View style={styles.sectionHeader}>
+                <View style={styles.sectionIconBox}>
+                  <Ionicons name="person" size={20} color={ACCENT} />
+                </View>
+                <Text style={styles.sectionTitle}>Meet Your Freelancer</Text>
+              </View>
+              <View style={styles.card}>
+                <View style={styles.freelancerRow}>
+                  <Image
+                    source={{ uri: freelancerDetails?.freelancerPic }}
+                    style={styles.freelancerImage}
+                  />
+                  <View style={styles.freelancerInfo}>
+                    <Text style={styles.freelancerName}>{freelancerDetails?.freelancerName}</Text>
+                    <Text style={styles.freelancerBio} numberOfLines={3}>
+                      {freelancerDetails?.professionalSummary}
+                    </Text>
+                    <TouchableOpacity style={styles.viewProfileBtn}>
+                      <Text style={styles.viewProfileText}>View Full Profile</Text>
+                      <Ionicons name="arrow-forward" size={13} color={ACCENT} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            </View>
+
+            {/* Pricing */}
+            <View style={styles.sectionContainer}>
+              <View style={styles.sectionHeader}>
+                <View style={styles.sectionIconBox}>
+                  <Ionicons name="pricetag" size={20} color={ACCENT} />
+                </View>
+                <Text style={styles.sectionTitle}>Choose Your Package</Text>
+              </View>
+              <GigPricing packagesDetails={packagesDetails} />
+            </View>
+
+            {/* Action Buttons */}
+            <View style={styles.actionSection}>
+              <TouchableOpacity
+                onPress={() => router.push('/gig-detail/order-detail')}
+                activeOpacity={0.85}
+                style={styles.primaryBtnWrapper}
               >
-                <Text style={styles.primaryBtnText}>Continue to Order</Text>
-                <Ionicons name="arrow-forward-circle" size={22} color="#FFF" />
-              </LinearGradient>
-            </TouchableOpacity>
+                <LinearGradient
+                  colors={[ACCENT, '#0891b2']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={styles.primaryBtn}
+                >
+                  <Text style={styles.primaryBtnText}>Continue to Order</Text>
+                  <Ionicons name="arrow-forward-circle" size={22} color="#FFF" />
+                </LinearGradient>
+              </TouchableOpacity>
 
-            <TouchableOpacity style={styles.secondaryBtn} activeOpacity={0.8}>
-              <Ionicons name="chatbubble-ellipses-outline" size={20} color="#147D7E" />
-              <Text style={styles.secondaryBtnText}>Contact Seller</Text>
-            </TouchableOpacity>
-          </View>
+              <TouchableOpacity style={styles.secondaryBtn} activeOpacity={0.8}>
+                <MessageCircle size={20} color={ACCENT} />
+                <Text style={styles.secondaryBtnText}>Contact Seller</Text>
+              </TouchableOpacity>
+            </View>
 
-          <View style={{ height: 30 }} />
-        </Animated.View>
+            <View style={{ height: 40 }} />
+          </Animated.View>
+        </LinearGradient>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F4F4F4'
+    backgroundColor: '#f0f9ff',
   },
   scrollContent: {
-    paddingBottom: 20,
+    paddingBottom: 0,
   },
+
+  // Hero
   heroSection: {
     position: 'relative',
     height: 320,
-    backgroundColor: '#000',
+    backgroundColor: '#0f2a35',
   },
   heroGradient: {
     position: 'absolute',
@@ -199,61 +224,67 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   heroContent: {
-    gap: 12,
+    gap: 10,
+  },
+  backBtn: {
+    position: 'absolute',
+    left: 16,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: 'rgba(255,255,255,0.18)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.30)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   profileChip: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'rgba(255,255,255,0.95)',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
     borderRadius: 24,
     alignSelf: 'flex-start',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 4,
-    gap: 8,
+    gap: 7,
   },
   chipAvatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     borderWidth: 2,
-    borderColor: '#147D7E',
+    borderColor: ACCENT,
   },
   chipName: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '700',
     color: '#1f2937',
   },
-  verifiedBadge: {
-    marginLeft: -4,
-  },
   heroTitle: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: '800',
-    color: '#FFF',
-    lineHeight: 32,
-    textShadowColor: 'rgba(0, 0, 0, 0.5)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 4,
+    color: '#fff',
+    lineHeight: 30,
+  },
+
+  // Body
+  bodyGradient: {
+    flex: 1,
   },
   contentContainer: {
-    paddingHorizontal: 20,
-    marginTop: -30,
+    paddingHorizontal: 16,
+    marginTop: 0,
+    paddingTop: 16,
   },
+
+  // Stats
   statsContainer: {
     flexDirection: 'row',
-    backgroundColor: '#FFF',
+    backgroundColor: 'rgba(255,255,255,0.85)',
     borderRadius: 16,
     padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 3,
+    borderWidth: 1,
+    borderColor: BORDER,
     marginBottom: 20,
   },
   statBox: {
@@ -262,111 +293,109 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   statValue: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '800',
-    color: '#1f2937',
+    color: TEXT_PRIMARY,
     marginTop: 4,
   },
   statLabel: {
-    fontSize: 11,
-    color: '#6b7280',
-    fontWeight: '500',
+    fontSize: 10,
+    color: TEXT_SECONDARY,
+    fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   statDivider: {
     width: 1,
-    backgroundColor: '#e5e7eb',
+    backgroundColor: BORDER,
     marginHorizontal: 8,
   },
+
+  // Sections
   sectionContainer: {
-    marginBottom: 24,
+    marginBottom: 22,
   },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 14,
+    marginBottom: 12,
     gap: 10,
   },
   sectionIconBox: {
     width: 36,
     height: 36,
     borderRadius: 10,
-    backgroundColor: '#e6f7f7',
+    backgroundColor: 'rgba(13,148,136,0.12)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1f2937',
-    letterSpacing: -0.3,
-  },
-  descriptionCard: {
-    backgroundColor: '#FFF',
-    borderRadius: 14,
-    padding: 18,
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
-  },
-  descriptionText: {
-    fontSize: 15,
-    color: '#4b5563',
-    lineHeight: 24,
-    letterSpacing: -0.1,
-  },
-  freelancerCard: {
-    backgroundColor: '#FFF',
-    borderRadius: 14,
-    padding: 18,
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  freelancerImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 12,
-    marginBottom: 14,
-    borderWidth: 2,
-    borderColor: '#147D7E',
-  },
-  freelancerInfo: {
-    gap: 8,
-  },
-  freelancerName: {
     fontSize: 17,
     fontWeight: '700',
-    color: '#1f2937',
+    color: TEXT_PRIMARY,
+    letterSpacing: -0.3,
+  },
+  card: {
+    backgroundColor: 'rgba(255,255,255,0.82)',
+    borderRadius: 14,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: BORDER,
+  },
+  descriptionText: {
+    fontSize: 14,
+    color: '#4b5563',
+    lineHeight: 22,
+  },
+
+  // Freelancer
+  freelancerRow: {
+    flexDirection: 'row',
+    gap: 14,
+  },
+  freelancerImage: {
+    width: 72,
+    height: 72,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: 'rgba(13,148,136,0.35)',
+    flexShrink: 0,
+  },
+  freelancerInfo: {
+    flex: 1,
+    gap: 6,
+  },
+  freelancerName: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: TEXT_PRIMARY,
   },
   freelancerBio: {
-    fontSize: 14,
-    color: '#6b7280',
-    lineHeight: 20,
+    fontSize: 13,
+    color: TEXT_SECONDARY,
+    lineHeight: 19,
   },
   viewProfileBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    marginTop: 4,
+    gap: 5,
+    marginTop: 2,
   },
   viewProfileText: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
-    color: '#147D7E',
+    color: ACCENT,
   },
+
+  // Actions
   actionSection: {
     gap: 12,
-    marginTop: 8,
+    marginTop: 4,
   },
   primaryBtnWrapper: {
     borderRadius: 14,
     overflow: 'hidden',
-    shadowColor: '#147D7E',
+    shadowColor: ACCENT,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -374,32 +403,32 @@ const styles = StyleSheet.create({
   },
   primaryBtn: {
     flexDirection: 'row',
-    height: 56,
+    height: 54,
     borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
     gap: 10,
   },
   primaryBtnText: {
-    color: '#FFF',
-    fontSize: 17,
+    color: '#fff',
+    fontSize: 16,
     fontWeight: '700',
     letterSpacing: 0.3,
   },
   secondaryBtn: {
     flexDirection: 'row',
-    backgroundColor: '#FFF',
-    height: 56,
+    backgroundColor: 'rgba(255,255,255,0.82)',
+    height: 54,
     borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#147D7E',
+    borderWidth: 1.5,
+    borderColor: ACCENT,
     gap: 8,
   },
   secondaryBtnText: {
-    color: '#147D7E',
-    fontSize: 17,
+    color: ACCENT,
+    fontSize: 16,
     fontWeight: '700',
   },
 });

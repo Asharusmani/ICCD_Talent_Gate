@@ -81,6 +81,7 @@ export default function ClientLayout() {
               options={{
                 title: 'Projects',
                 headerShown: true,
+                header: () => <ChatHeader title="Create Project" />
               }}
             />
 

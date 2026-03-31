@@ -4,29 +4,44 @@ import { ArrowLeft, User, Mail } from 'lucide-react-native';
 import React from 'react';
 import { Image } from 'react-native';
 import { Controller, useForm } from 'react-hook-form';
+import PrimaryButton from '@/components/ui/PrimaryButton';
 import {
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
     View,
-    StatusBar,
     KeyboardAvoidingView,
     Platform,
     ScrollView,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
-const PRIMARY_COLOR = '#225b6b';
-const SECONDARY_COLOR = '#378793';
+// ─── DARK MODE COLORS ───────────────────────────────────────────────
+// const PRIMARY = '#225b6b';
+// const MID = '#1a4455';
+// const DARK = '#0f2a35';
+// const DARKEST = '#091e27';
+// const ACCENT = '#4ecdc4';
+// const BORDER = 'rgba(255,255,255,0.10)';
+// const TEXT_PRIMARY = '#ffffff';
+// const TEXT_SECONDARY = 'rgba(255,255,255,0.50)';
+// ────────────────────────────────────────────────────────────────────
+
+// ─── LIGHT MODE COLORS ──────────────────────────────────────────────
+const PRIMARY = '#7dd3fc';
+const MID = '#bae6fd';
+const DARK = '#e0f2fe';
+const DARKEST = '#f0f9ff';
+const ACCENT = '#0d9488';
+const BORDER = 'rgba(14,165,233,0.20)';
+const TEXT_PRIMARY = '#0f172a';
+const TEXT_SECONDARY = 'rgba(15,23,42,0.50)';
+// ────────────────────────────────────────────────────────────────────
 
 export default function SignUpScreen() {
     const router = useRouter();
-    const {
-        control,
-        handleSubmit,
-        formState: { errors },
-    } = useForm();
+    const { control, handleSubmit, formState: { errors } } = useForm();
 
     const onSubmit = (data: any) => {
         console.log('Form Data:', data);
@@ -34,49 +49,42 @@ export default function SignUpScreen() {
     };
 
     return (
-        <>
-            <KeyboardAvoidingView
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                style={styles.container}
+        <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={styles.container}
+        >
+            <LinearGradient
+                colors={[DARKEST, DARK, MID, PRIMARY]}
+                style={styles.fullBackground}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 0.6, y: 1 }}
             >
                 <ScrollView
                     contentContainerStyle={styles.scrollContent}
                     showsVerticalScrollIndicator={false}
                 >
-
-                    <LinearGradient
-                        colors={[PRIMARY_COLOR, SECONDARY_COLOR]}
-                        style={styles.headerGradient}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                    >
-                        <TouchableOpacity
-                            onPress={() => router.back()}
-                            style={styles.backButton}
-                        >
-                            <ArrowLeft size={24} color="#fff" />
+                    {/* Top Section */}
+                    <View style={styles.topSection}>
+                        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                            <ArrowLeft size={20} color={TEXT_PRIMARY} />
                         </TouchableOpacity>
 
-                        <View style={styles.headerContent}>
-                            <View style={styles.logoCircle}>
-                                <Image
-                                    source={require('../../assets/images/iccd-login-logo.png')}
-                                    style={styles.iccd}
-                                    resizeMode="contain"
-                                />
-                            </View>
-                            <Text style={styles.heading}>Create Account </Text>
-                            <Text style={styles.subHeading}>
-                                Join Us And Start Your Journey Today
-                            </Text>
+                        <View style={styles.logoWrap}>
+                            <Image
+                                source={require('../../assets/images/iccd-login-logo.png')}
+                                style={styles.logo}
+                                resizeMode="contain"
+                            />
                         </View>
-                    </LinearGradient>
+                        <Text style={styles.heading}>Create Account</Text>
+                        <Text style={styles.subHeading}>Join us and start your journey today</Text>
+                    </View>
 
-                    {/* Form Section */}
-                    <View style={styles.formContainer}>
+                    {/* Form Card */}
+                    <View style={styles.formCard}>
+
                         {/* Name Row */}
                         <View style={styles.nameRow}>
-                            {/* First Name */}
                             <View style={styles.nameInputWrapper}>
                                 <Text style={styles.label}>First Name</Text>
                                 <Controller
@@ -85,11 +93,11 @@ export default function SignUpScreen() {
                                     rules={{ required: 'Required' }}
                                     render={({ field: { onChange, value } }) => (
                                         <View style={[styles.inputContainer, errors.firstName && styles.inputError]}>
-                                            <User size={18} color="#999" style={styles.inputIcon} />
+                                            <User size={15} color={ACCENT} style={styles.inputIcon} />
                                             <TextInput
                                                 style={styles.input}
-                                                placeholder="Syed"
-                                                placeholderTextColor="#999"
+                                                placeholder="First Name"
+                                                placeholderTextColor="rgba(15,23,42,0.30)"  // dark: "rgba(255,255,255,0.28)"
                                                 value={value}
                                                 onChangeText={onChange}
                                             />
@@ -97,13 +105,10 @@ export default function SignUpScreen() {
                                     )}
                                 />
                                 {errors.firstName && (
-                                    <Text style={styles.errorText}>
-                                        {String(errors.firstName?.message)}
-                                    </Text>
+                                    <Text style={styles.errorText}>{String(errors.firstName?.message)}</Text>
                                 )}
                             </View>
 
-                            {/* Last Name */}
                             <View style={styles.nameInputWrapper}>
                                 <Text style={styles.label}>Last Name</Text>
                                 <Controller
@@ -112,11 +117,11 @@ export default function SignUpScreen() {
                                     rules={{ required: 'Required' }}
                                     render={({ field: { onChange, value } }) => (
                                         <View style={[styles.inputContainer, errors.lastName && styles.inputError]}>
-                                            <User size={18} color="#999" style={styles.inputIcon} />
+                                            <User size={15} color={ACCENT} style={styles.inputIcon} />
                                             <TextInput
                                                 style={styles.input}
-                                                placeholder="Mohid"
-                                                placeholderTextColor="#999"
+                                                placeholder="Last Name"
+                                                placeholderTextColor="rgba(15,23,42,0.30)"  // dark: "rgba(255,255,255,0.28)"
                                                 value={value}
                                                 onChangeText={onChange}
                                             />
@@ -124,14 +129,12 @@ export default function SignUpScreen() {
                                     )}
                                 />
                                 {errors.lastName && (
-                                    <Text style={styles.errorText}>
-                                        {String(errors.lastName?.message)}
-                                    </Text>
+                                    <Text style={styles.errorText}>{String(errors.lastName?.message)}</Text>
                                 )}
                             </View>
                         </View>
 
-                        {/* Email Field */}
+                        {/* Email */}
                         <View style={styles.inputWrapper}>
                             <Text style={styles.label}>Email Address</Text>
                             <Controller
@@ -143,11 +146,11 @@ export default function SignUpScreen() {
                                 }}
                                 render={({ field: { onChange, value } }) => (
                                     <View style={[styles.inputContainer, errors.email && styles.inputError]}>
-                                        <Mail size={18} color="#999" style={styles.inputIcon} />
+                                        <Mail size={15} color={ACCENT} style={styles.inputIcon} />
                                         <TextInput
                                             style={styles.input}
-                                            placeholder="matz.solutions@example.com"
-                                            placeholderTextColor="#999"
+                                            placeholder="you@example.com"
+                                            placeholderTextColor="rgba(15,23,42,0.30)"  // dark: "rgba(255,255,255,0.28)"
                                             keyboardType="email-address"
                                             autoCapitalize="none"
                                             textContentType="emailAddress"
@@ -158,27 +161,12 @@ export default function SignUpScreen() {
                                 )}
                             />
                             {errors.email && (
-                                <Text style={styles.errorText}>
-                                    {String(errors.email?.message)}
-                                </Text>
+                                <Text style={styles.errorText}>{String(errors.email?.message)}</Text>
                             )}
                         </View>
 
                         {/* Register Button */}
-                        <TouchableOpacity
-                            style={styles.registerButton}
-                            activeOpacity={0.8}
-                            onPress={handleSubmit(onSubmit)}
-                        >
-                            <LinearGradient
-                                colors={[PRIMARY_COLOR, SECONDARY_COLOR]}
-                                style={styles.registerGradient}
-                                start={{ x: 0, y: 0 }}
-                                end={{ x: 1, y: 0 }}
-                            >
-                                <Text style={styles.registerButtonText}>Create Account</Text>
-                            </LinearGradient>
-                        </TouchableOpacity>
+                        <PrimaryButton label="Create Account" onPress={handleSubmit(onSubmit)} />
 
                         {/* Divider */}
                         <View style={styles.dividerContainer}>
@@ -187,11 +175,8 @@ export default function SignUpScreen() {
                             <View style={styles.divider} />
                         </View>
 
-                        {/* Google Sign In Button */}
-                        <TouchableOpacity
-                            style={styles.googleButton}
-                            activeOpacity={0.85}
-                        >
+                        {/* Google */}
+                        <TouchableOpacity style={styles.googleButton} activeOpacity={0.8}>
                             <Image
                                 source={require('../../assets/images/google.png')}
                                 style={styles.googleIcon}
@@ -208,247 +193,187 @@ export default function SignUpScreen() {
                             </TouchableOpacity>
                         </View>
 
-                        {/* Terms Text */}
+                        {/* Terms */}
                         <Text style={styles.termsText}>
                             By signing up, you agree to our{' '}
-                            <Text
-                                style={styles.termsLink}
-                                onPress={() => router.push('/(policy)/TermsOfServices')}
-                            >
+                            <Text style={styles.termsLink} onPress={() => router.push('/(policy)/TermsOfServices')}>
                                 Terms of Service
                             </Text>
                             {' '}and{' '}
-                            <Text
-                                style={styles.termsLink}
-                                onPress={() => router.push('/(policy)/PrivacyPolicy')}
-                            >
+                            <Text style={styles.termsLink} onPress={() => router.push('/(policy)/PrivacyPolicy')}>
                                 Privacy Policy
                             </Text>
                         </Text>
 
                     </View>
                 </ScrollView>
-            </KeyboardAvoidingView>
-        </>
+            </LinearGradient>
+        </KeyboardAvoidingView>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#F4F4F4'
-    },
-    scrollContent: {
-        flexGrow: 1,
-    },
-    headerGradient: {
-        paddingTop: 30,
-        paddingBottom: 20,
-        paddingHorizontal: 24,
-        borderBottomLeftRadius: 30,
-        borderBottomRightRadius: 30,
-    },
-    iccd: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
+    container: { flex: 1 },
+    fullBackground: { flex: 1 },
+    scrollContent: { flexGrow: 1, paddingBottom: 48 },
 
+    topSection: {
+        alignItems: 'center',
+        paddingTop: 65,
+        paddingBottom: 40,
+        paddingHorizontal: 24,
     },
     backButton: {
+        alignSelf: 'flex-start',
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: 'rgba(255,255,255,0.2)',
+        backgroundColor: 'rgba(255,255,255,0.60)',   // dark: 'rgba(255,255,255,0.1)'
+        borderWidth: 1,
+        borderColor: BORDER,
         alignItems: 'center',
         justifyContent: 'center',
-        marginTop: 16,
+        marginBottom: 20,
     },
-    headerContent: {
-        alignItems: 'center',
-    },
-    logoCircle: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
+    logoWrap: {
+        width: 90,
+        height: 90,
+        borderRadius: 45,
+        backgroundColor: 'rgba(255,255,255,0.60)',    // dark: 'rgba(78,205,196,0.13)'
+        borderWidth: 2,
+        borderColor: 'rgba(13,148,136,0.35)',         // dark: 'rgba(78,205,196,0.3)'
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 16,
+        marginBottom: 24,
     },
-    logoText: {
-        fontSize: 40,
+    logo: {
+        width: 66,
+        height: 66,
+        borderRadius: 33,
+        tintColor: '#0d9488',
     },
     heading: {
-        fontSize: 32,
-        fontWeight: '700',
-        color: '#fff',
+        fontSize: 34,
+        fontWeight: '800',
+        color: TEXT_PRIMARY,
         marginBottom: 8,
+        letterSpacing: 0.2,
     },
     subHeading: {
-        fontSize: 16,
-        color: 'rgba(255,255,255,0.9)',
+        fontSize: 15,
+        color: TEXT_SECONDARY,
         textAlign: 'center',
+        lineHeight: 22,
     },
-    formContainer: {
-        flex: 1,
+
+    formCard: {
+        marginHorizontal: 16,
+        backgroundColor: 'rgba(255,255,255,0.70)',   // dark: 'rgba(255,255,255,0.05)'
+        borderRadius: 28,
+        borderWidth: 1,
+        borderColor: BORDER,
         paddingHorizontal: 24,
-        paddingTop: 32,
+        paddingTop: 34,
+        paddingBottom: 28,
     },
+
     nameRow: {
         flexDirection: 'row',
         marginBottom: 20,
         gap: 12,
     },
-    nameInputWrapper: {
-        flex: 1,
-    },
-    inputWrapper: {
-        marginBottom: 20,
-    },
+    nameInputWrapper: { flex: 1 },
+    inputWrapper: { marginBottom: 20 },
     label: {
-        fontSize: 14,
-        fontWeight: '600',
-        color: '#333',
-        marginBottom: 8,
+        fontSize: 11,
+        fontWeight: '700',
+        color: 'rgba(15,23,42,0.55)',                // dark: 'rgba(255,255,255,0.55)'
+        marginBottom: 10,
+        letterSpacing: 1,
+        textTransform: 'uppercase',
     },
     inputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#fff',
-        borderRadius: 12,
-        borderWidth: 1.5,
-        borderColor: '#e8e8e8',
-        paddingHorizontal: 16,
-        height: 56,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
-        elevation: 2,
+        backgroundColor: 'rgba(255,255,255,0.85)',   // dark: 'rgba(255,255,255,0.07)'
+        borderRadius: 14,
+        borderWidth: 1,
+        borderColor: BORDER,
+        paddingHorizontal: 14,
+        height: 54,
     },
-    inputError: {
-        borderColor: '#ff4444',
-    },
-    inputIcon: {
-        marginRight: 12,
-    },
-    googleButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#fff',
-        borderRadius: 12,
-        borderWidth: 1.5,
-        borderColor: '#e8e8e8',
-        paddingVertical: 16,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
-        elevation: 2,
-    },
-    googleIcon: {
-        width: 24,
-        height: 24,
-        marginRight: 12,
-    },
-    googleText: {
-        color: '#333',
-        fontSize: 16,
-        fontWeight: '600',
-    },
-    input: {
-        flex: 1,
-        fontSize: 16,
-        color: '#333',
-    },
-    errorText: {
-        color: '#ff4444',
-        fontSize: 12,
-        marginTop: 6,
-        marginLeft: 4,
-    },
+    inputError: { borderColor: '#ff6b6b' },
+    inputIcon: { marginRight: 10 },
+    input: { flex: 1, fontSize: 14, color: TEXT_PRIMARY },
+    errorText: { color: '#ff6b6b', fontSize: 11, marginTop: 5, marginLeft: 4 },
+
     registerButton: {
-        borderRadius: 12,
+        borderRadius: 14,
         overflow: 'hidden',
-        shadowColor: PRIMARY_COLOR,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
-        elevation: 6,
+        shadowColor: ACCENT,
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.4,
+        shadowRadius: 14,
+        elevation: 10,
         marginTop: 8,
     },
     registerGradient: {
-        paddingVertical: 16,
+        paddingVertical: 17,
         alignItems: 'center',
         justifyContent: 'center',
     },
     registerButtonText: {
-        color: '#fff',
-        fontSize: 18,
-        fontWeight: '700',
+        color: DARKEST,
+        fontSize: 17,
+        fontWeight: '800',
+        letterSpacing: 0.5,
     },
+
     dividerContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginVertical: 28,
+        marginVertical: 26,
     },
-    divider: {
-        flex: 1,
-        height: 1,
-        backgroundColor: '#e8e8e8',
-    },
+    divider: { flex: 1, height: 1, backgroundColor: BORDER },
     dividerText: {
-        marginHorizontal: 16,
-        color: '#999',
-        fontSize: 14,
-        fontWeight: '500',
+        marginHorizontal: 14,
+        color: TEXT_SECONDARY,
+        fontSize: 13,
+        fontWeight: '600',
     },
+
     googleButton: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#fff',
-        borderRadius: 12,
-        borderWidth: 1.5,
-        borderColor: '#e8e8e8',
-        paddingVertical: 16,
-        gap: 12,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
-        elevation: 2,
+        backgroundColor: 'rgba(255,255,255,0.85)',   // dark: 'rgba(255,255,255,0.07)'
+        borderRadius: 14,
+        borderWidth: 1,
+        borderColor: BORDER,
+        paddingVertical: 15,
+        gap: 10,
     },
-    googleText: {
-        color: '#333',
-        fontSize: 16,
-        fontWeight: '600',
-    },
+    googleIcon: { width: 22, height: 22 },
+    googleText: { color: TEXT_PRIMARY, fontSize: 15, fontWeight: '600' },
+
     signinContainer: {
         flexDirection: 'row',
         justifyContent: 'center',
-        marginTop: 28,
+        marginTop: 26,
     },
-    signinText: {
-        color: '#666',
-        fontSize: 15,
-    },
-    signinLink: {
-        color: PRIMARY_COLOR,
-        fontSize: 15,
-        fontWeight: '700',
-    },
+    signinText: { color: TEXT_SECONDARY, fontSize: 14 },
+    signinLink: { color: ACCENT, fontSize: 14, fontWeight: '800' },
+
     termsText: {
         textAlign: 'center',
-        color: '#999',
-        fontSize: 13,
+        color: 'rgba(15,23,42,0.40)',                // dark: 'rgba(255,255,255,0.35)'
+        fontSize: 12,
         lineHeight: 20,
-        marginTop: 20,
-        marginBottom: 24,
-        paddingHorizontal: 16,
+        marginTop: 18,
+        paddingHorizontal: 10,
     },
     termsLink: {
-        color: PRIMARY_COLOR,
-        fontWeight: '600',
+        color: ACCENT,
+        fontWeight: '700',
     },
 });

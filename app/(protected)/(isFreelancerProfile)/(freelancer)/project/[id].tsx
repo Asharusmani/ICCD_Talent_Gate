@@ -14,8 +14,14 @@ import {
     TouchableOpacity,
     View
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { BlurView } from "expo-blur";
 import ICCDLoader from '@/components/ui/loader2';
+import { useHeaderHeight } from '@react-navigation/elements';
+
+const ACCENT = '#0d9488';
+const BORDER = 'rgba(255,255,255,0.55)';
+const TEXT_PRIMARY = '#0f172a';
+const TEXT_SECONDARY = '#6b7280';
 
 interface User {
   name: string;
@@ -23,7 +29,7 @@ interface User {
 }
 
 const ProjectDetail = () => {
-
+  const headerHeight = useHeaderHeight();
   const { freelancer } = useAuth()
   const { id } = useLocalSearchParams()
   const { data, isSuccess, isPending, isError, isLoading } = useGetProjectsById(id)
@@ -33,15 +39,23 @@ const ProjectDetail = () => {
   const { clientID } = data[0]
 
   return (
-    <SafeAreaView style={styles.container}>
+    <LinearGradient
+      colors={['#f0f9ff', '#e0f2fe', '#bae6fd', '#7dd3fc']}
+      style={{ flex: 1 }}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0.6, y: 1 }}
+    >
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingTop: headerHeight + 16 }
+        ]}
       >
         {/* SECTION 1 */}
-        <View style={[styles.card, styles.cardShadow]}>
+        <BlurView intensity={45} tint="light" style={styles.card}>
           <View style={styles.titleRow}>
-            <View style={styles.purpleBar} />
+            <View style={styles.accentBar} />
             <Text style={styles.mainTitle}>We're looking for a...</Text>
           </View>
 
@@ -49,70 +63,61 @@ const ProjectDetail = () => {
 
           <View style={styles.tagContainer}>
             <View style={styles.tagBubble}>
-              <MaterialCommunityIcons name="earth" size={18} color="white" />
+              <MaterialCommunityIcons name="earth" size={16} color="#fff" />
               <Text style={styles.tagText}>Remote</Text>
             </View>
-
             <View style={styles.tagBubble}>
-              <MaterialCommunityIcons
-                name="clock-time-four-outline"
-                size={18}
-                color="white"
-              />
+              <MaterialCommunityIcons name="clock-time-four-outline" size={16} color="#fff" />
               <Text style={styles.tagText}>{data[0]?.duration || 'N/A'}</Text>
             </View>
           </View>
 
-          <View style={[styles.tagBubble, { width: 220, marginTop: 15 }]}>
-            <MaterialIcons name="group" size={18} color="white" />
+          <View style={[styles.tagBubble, { alignSelf: 'flex-start', marginTop: 12 }]}>
+            <MaterialIcons name="group" size={16} color="#fff" />
             <Text style={styles.tagText}>Hiring freelancer</Text>
           </View>
-        </View>
+        </BlurView>
 
         {/* SECTION 2 */}
-        <LinearGradient
-          colors={["#CCF2F4", "#FFFFFF"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={[styles.budgetCard, styles.cardShadow]}
-        >
+        <BlurView intensity={45} tint="light" style={styles.budgetCard}>
           <Text style={styles.budgetTextSmall}>Client Budget</Text>
           <Text style={styles.budgetAmount}>{data[0]?.budget || 'N/A'}</Text>
 
           <View style={styles.proposalRow}>
             <View style={styles.proposalSegments}>
               {[1, 2, 3].map((i) => (
-                <View
-                  key={i}
-                  style={[styles.segment, styles.activeSegment]}
-                />
+                <View key={i} style={[styles.segment, styles.activeSegment]} />
               ))}
               {[4, 5].map((i) => (
-                <View
-                  key={i}
-                  style={[styles.segment, styles.inactiveSegment]}
-                />
+                <View key={i} style={[styles.segment, styles.inactiveSegment]} />
               ))}
             </View>
             <Text style={styles.proposalText}>2 Proposals</Text>
           </View>
 
-          <TouchableOpacity style={styles.interestButton}
+          <TouchableOpacity
+            style={styles.interestButton}
             onPress={() => router.push({
               pathname: '/project/step1-project-details',
               params: { freelancerId: freelancer.id, projectId: id, clientId: clientID }
             })}
           >
-            <Text style={styles.interestButtonText}>I'm Interested</Text>
+            <LinearGradient
+              colors={[ACCENT, '#0891b2']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.interestGradient}
+            >
+              <Text style={styles.interestButtonText}>I'm Interested</Text>
+            </LinearGradient>
           </TouchableOpacity>
-        </LinearGradient>
+        </BlurView>
 
         {/* SECTION 3 */}
-        <View style={[styles.cardWithHeader, styles.cardShadow]}>
+        <BlurView intensity={45} tint="light" style={styles.cardWithHeader}>
           <View style={styles.cardHeaderArea}>
             <Text style={styles.cardHeaderText}>Deliverables</Text>
           </View>
-
           <View style={styles.cardBody}>
             <Text style={styles.descriptionText}>
               {data[0]?.deliverable || 'N/A'}
@@ -120,29 +125,19 @@ const ProjectDetail = () => {
 
             {/* <View style={styles.deadlineBox}>
               <View style={styles.deadlineHeader}>
-                <MaterialCommunityIcons
-                  name="calendar-month"
-                  size={20}
-                  color="#0A5A72"
-                />
+                <MaterialCommunityIcons name="calendar-month" size={20} color="#0A5A72" />
                 <Text style={styles.deadlineTitle}>Deadline</Text>
               </View>
-              <Text style={styles.deadlineDate}>
-                April 3 - April 3, 2010
-              </Text>
+              <Text style={styles.deadlineDate}>April 3 - April 3, 2010</Text>
             </View> */}
           </View>
-        </View>
+        </BlurView>
 
         {/* SECTION 4 */}
-        <View style={[styles.card, styles.cardShadow]}>
+        <BlurView intensity={45} tint="light" style={styles.card}>
           {/* <View style={styles.infoItem}>
             <View style={styles.iconCircle}>
-              <MaterialIcons
-                name="business-center"
-                size={24}
-                color="white"
-              />
+              <MaterialIcons name="business-center" size={24} color="white" />
             </View>
             <Text style={styles.infoLabel}>Project type</Text>
             <Text style={styles.infoValue}>Fixed Prize</Text>
@@ -150,7 +145,7 @@ const ProjectDetail = () => {
 
           <View style={styles.infoItem}>
             <View style={styles.iconCircle}>
-              <MaterialCommunityIcons name="earth" size={24} color="white" />
+              <MaterialCommunityIcons name="earth" size={22} color="#fff" />
             </View>
             <Text style={styles.infoLabel}>Language</Text>
             {data[0]?.languages?.split(",")?.map((item: string, index: number) => (
@@ -160,22 +155,17 @@ const ProjectDetail = () => {
 
           <View style={styles.infoItem}>
             <View style={styles.iconCircle}>
-              <MaterialCommunityIcons
-                name="calendar-check"
-                size={24}
-                color="white"
-              />
+              <MaterialCommunityIcons name="calendar-check" size={22} color="#fff" />
             </View>
             <Text style={styles.infoLabel}>Project Deadline</Text>
             <Text style={styles.infoValue}>
               {formatDate(data[0]?.deadline) || 'N/A'}
             </Text>
           </View>
-        </View>
-
+        </BlurView>
 
         {/* SECTION 6 */}
-        <View style={[styles.cardWithHeader, styles.cardShadow]}>
+        <BlurView intensity={45} tint="light" style={styles.cardWithHeader}>
           <View style={styles.cardHeaderArea}>
             <Text style={styles.cardHeaderText}>Required Skills</Text>
           </View>
@@ -186,7 +176,7 @@ const ProjectDetail = () => {
               </View>
             ))}
           </View>
-        </View>
+        </BlurView>
 
         {/* SECTION 7 */}
         {/* <View style={[styles.cardWithHeader, styles.cardShadow]}>
@@ -199,28 +189,28 @@ const ProjectDetail = () => {
             </View>
           </View>
         </View> */}
+
       </ScrollView>
-    </SafeAreaView>
+    </LinearGradient>
   );
 };
 
 export default ProjectDetail;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F4F4F4' },
-  scrollContent: { padding: 15 },
+  scrollContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 120,
+    gap: 14,
+  },
 
   headerNav: { paddingHorizontal: 15, paddingVertical: 10 },
   backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
+    width: 40, height: 40, borderRadius: 10,
     backgroundColor: "#8CB4B8",
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: "center", alignItems: "center",
   },
 
-  /* 🔹 GLOBAL CARD SHADOW */
   cardShadow: {
     elevation: 10,
     shadowColor: "#000",
@@ -229,87 +219,101 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
   },
 
+  // Glass Card
   card: {
-    backgroundColor: "white",
-    borderRadius: 12,
+    borderRadius: 20,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: BORDER,
     padding: 20,
-    marginBottom: 20,
   },
 
-  titleRow: { flexDirection: "row", alignItems: "center", marginBottom: 5 },
-  purpleBar: {
-    width: 5,
-    height: 30,
-    backgroundColor: "#6200EE",
+  titleRow: { flexDirection: "row", alignItems: "center", marginBottom: 8 },
+  accentBar: {
+    width: 4,
+    height: 28,
+    backgroundColor: ACCENT,
     marginRight: 10,
     borderRadius: 2,
   },
-
-  mainTitle: { fontSize: 20, fontWeight: "bold", color: "#000" },
+  mainTitle: { fontSize: 18, fontWeight: '800', color: TEXT_PRIMARY },
   subTitle: {
-    fontSize: 18,
-    color: "#8CB4B8",
-    marginLeft: 15,
-    marginBottom: 15,
-    fontWeight: "600",
+    fontSize: 16,
+    color: ACCENT,
+    marginLeft: 14,
+    marginBottom: 14,
+    fontWeight: '700',
   },
 
-  tagContainer: { flexDirection: "row" },
+  tagContainer: { flexDirection: "row", flexWrap: 'wrap', gap: 8 },
   tagBubble: {
     flexDirection: "row",
-    backgroundColor: "#8CA7B4",
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 20,
+    backgroundColor: ACCENT,
+    paddingVertical: 7,
+    paddingHorizontal: 14,
+    borderRadius: 30,
     alignItems: "center",
-    marginRight: 10,
+    gap: 6,
   },
-  tagText: { color: "white", marginLeft: 5, fontSize: 12 },
+  tagText: { color: "#fff", fontSize: 12, fontWeight: '600' },
 
-  budgetCard: { borderRadius: 12, padding: 20, marginBottom: 20 },
-
-  budgetTextSmall: { fontSize: 16, color: "#7B9E9E" },
+  // Budget Card
+  budgetCard: {
+    borderRadius: 20,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: BORDER,
+    padding: 20,
+  },
+  budgetTextSmall: { fontSize: 13, color: TEXT_SECONDARY, fontWeight: '600', marginBottom: 4 },
   budgetAmount: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#0A5A72",
-    marginVertical: 10,
+    fontSize: 28,
+    fontWeight: '900',
+    color: TEXT_PRIMARY,
+    letterSpacing: -0.5,
+    marginBottom: 14,
   },
-
-  proposalRow: { flexDirection: "row", alignItems: "center", marginBottom: 15 },
-  proposalSegments: { flexDirection: "row", marginRight: 10 },
-  segment: { width: 15, height: 8, borderRadius: 2, marginRight: 4 },
-  activeSegment: { backgroundColor: "#00D15D" },
-  inactiveSegment: { backgroundColor: "#B2E0E6" },
-  proposalText: { fontSize: 12, color: "#7B9E9E" },
+  proposalRow: { flexDirection: "row", alignItems: "center", marginBottom: 18 },
+  proposalSegments: { flexDirection: "row", marginRight: 10, gap: 4 },
+  segment: { width: 16, height: 7, borderRadius: 4 },
+  activeSegment: { backgroundColor: ACCENT },
+  inactiveSegment: { backgroundColor: 'rgba(14,165,233,0.2)' },
+  proposalText: { fontSize: 12, color: TEXT_SECONDARY, fontWeight: '600' },
 
   interestButton: {
-    backgroundColor: "#0A5A72",
-    paddingVertical: 10,
-    borderRadius: 5,
-    width: 150,
-    alignItems: "center",
+    borderRadius: 14,
+    overflow: 'hidden',
+    alignSelf: 'flex-start',
   },
-  interestButtonText: { color: "white", fontWeight: "600" },
+  interestGradient: {
+    paddingVertical: 12,
+    paddingHorizontal: 28,
+  },
+  interestButtonText: { color: '#fff', fontWeight: '700', fontSize: 14 },
 
+  // Card with Header
   cardWithHeader: {
-    backgroundColor: "white",
-    borderRadius: 12,
-    marginBottom: 20,
-    overflow: "hidden",
+    borderRadius: 20,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: BORDER,
   },
-
-  cardHeaderArea: { backgroundColor: "#CCF2F4", padding: 15 },
+  cardHeaderArea: {
+    backgroundColor: 'rgba(13,148,136,0.12)',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(13,148,136,0.15)',
+    padding: 16,
+  },
   cardHeaderText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#0A5A72",
+    fontSize: 15,
+    fontWeight: '800',
+    color: ACCENT,
+    letterSpacing: -0.3,
   },
-
-  cardBody: { padding: 15 },
+  cardBody: { padding: 16 },
   descriptionText: {
-    color: "#999",
-    lineHeight: 20,
+    color: TEXT_SECONDARY,
+    lineHeight: 22,
     fontSize: 14,
     marginBottom: 15,
   },
@@ -321,71 +325,52 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#C5CAE9",
   },
-
   deadlineHeader: { flexDirection: "row", alignItems: "center" },
   deadlineTitle: { fontSize: 14, fontWeight: "bold", marginLeft: 8 },
   deadlineDate: { marginLeft: 28 },
 
-  infoItem: { alignItems: "center", marginBottom: 25 },
+  // Info Items
+  infoItem: { alignItems: "center", marginBottom: 20 },
   iconCircle: {
-    width: 45,
-    height: 45,
-    borderRadius: 22.5,
-    backgroundColor: "#0A5A72",
-    justifyContent: "center",
-    alignItems: "center",
+    width: 48, height: 48, borderRadius: 24,
+    backgroundColor: ACCENT,
+    justifyContent: "center", alignItems: "center",
     marginBottom: 8,
+    shadowColor: ACCENT,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
-
-  infoLabel: { fontSize: 16, fontWeight: "bold", color: "#0A5A72" },
-  infoValue: { fontSize: 14, color: "#0A5A72" },
+  infoLabel: { fontSize: 14, fontWeight: '800', color: TEXT_PRIMARY, marginBottom: 3 },
+  infoValue: { fontSize: 13, color: TEXT_SECONDARY, fontWeight: '500' },
 
   tableHeader: {
     flexDirection: "row",
-    backgroundColor: "#0A5A72",
-    paddingVertical: 12,
-    paddingHorizontal: 15,
+    backgroundColor: ACCENT,
+    paddingVertical: 12, paddingHorizontal: 15,
   },
-  tableHeaderText: {
-    flex: 1,
-    color: "white",
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-
+  tableHeaderText: { flex: 1, color: "white", fontWeight: "bold", textAlign: "center" },
   tableRow: {
     flexDirection: "row",
-    paddingVertical: 15,
-    paddingHorizontal: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: "#F0F0F0",
+    paddingVertical: 15, paddingHorizontal: 15,
+    borderBottomWidth: 1, borderBottomColor: "#F0F0F0",
     alignItems: "center",
   },
-
   nameCell: { flex: 1, flexDirection: "row", alignItems: "center" },
   avatar: { width: 35, height: 35, borderRadius: 17.5, marginRight: 10 },
-  rowText: {
-    flex: 1,
-    textAlign: "center",
-    color: "#0A5A72",
-    fontWeight: "500",
-  },
-  cvText: {
-    flex: 1,
-    color: "#8CB4B8",
-    fontSize: 11,
-    textAlign: "center",
-    fontWeight: "bold",
-  },
+  rowText: { flex: 1, textAlign: "center", color: TEXT_PRIMARY, fontWeight: "500" },
+  cvText: { flex: 1, color: TEXT_SECONDARY, fontSize: 11, textAlign: "center", fontWeight: "bold" },
 
-  skillTagRow: { flexDirection: "row", padding: 15 },
+  // Skills
+  skillTagRow: { flexDirection: "row", flexWrap: 'wrap', padding: 14, gap: 8 },
   skillTag: {
-    backgroundColor: "#E0D8DE",
-    paddingVertical: 10,
-    paddingHorizontal: 25,
-    borderRadius: 20,
-    marginRight: 10,
+    backgroundColor: 'rgba(13,148,136,0.10)',
+    borderWidth: 1,
+    borderColor: 'rgba(13,148,136,0.2)',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 30,
   },
-  skillTagText: { fontWeight: "600" },
+  skillTagText: { fontWeight: '700', color: ACCENT, fontSize: 12 },
 });
-

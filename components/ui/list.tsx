@@ -1,46 +1,47 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { Text, View, ActivityIndicator, StyleSheet, FlatList } from 'react-native'
-import { useCallback } from 'react';
 
-interface Listprops {
-    data: any,
+interface ListProps {
+    data: any;
     error: string | null;
     isLoading: boolean;
     hasNextPage: boolean;
     isFetchingNextPage: boolean;
     fetchNextPage: () => void;
     renderItem: any;
+    contentContainerStyle?: any;
 }
 
 function List({
-    data, error,
-    isLoading, hasNextPage,
-    isFetchingNextPage, fetchNextPage,
-    renderItem }: Listprops) {
+    data,
+    error,
+    isLoading,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+    renderItem,
+    contentContainerStyle,
+}: ListProps) {
 
-    // fetch more data
     const handleLoadMore = useCallback(() => {
         if (hasNextPage && !isFetchingNextPage) {
             fetchNextPage();
         }
     }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-    // show flat list footer
     const renderFooter = () => {
         if (!isFetchingNextPage) return null;
         return (
             <View style={styles.footer}>
-                <ActivityIndicator size="small" color="#0000ff" />
+                <ActivityIndicator size="small" color="#0d9488" />
             </View>
         );
     };
 
-    // requested data is loading
     if (isLoading) {
-        return <ActivityIndicator style={{ marginTop: 20 }} />;
+        return <ActivityIndicator style={{ marginTop: 20 }} color="#0d9488" />;
     }
 
-    // show error if anything go wrong
     if (error) {
         return <Text style={{ color: 'red' }}>{error}</Text>;
     }
@@ -54,15 +55,16 @@ function List({
             ListFooterComponent={renderFooter}
             renderItem={renderItem}
             showsVerticalScrollIndicator={false}
+            contentContainerStyle={contentContainerStyle}
         />
-    )
+    );
 }
 
-export default List
+export default List;
 
 const styles = StyleSheet.create({
     footer: {
         padding: 20,
         alignItems: 'center',
     },
-})
+});

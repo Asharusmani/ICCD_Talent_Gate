@@ -57,6 +57,7 @@ export default function FreelancerLayout() {
             options={{
               title: 'Dispute',
               headerShown: false,
+
             }}
           />
 

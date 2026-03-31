@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import { Bell, MessageCircle } from "lucide-react-native";
+import { Bell, MessageCircle, ShoppingCart } from "lucide-react-native";
 import { StyleSheet, TouchableOpacity, View, Text } from "react-native";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
@@ -8,10 +8,8 @@ const ACCENT = '#0d9488';
 const BORDER = 'rgba(255,255,255,0.55)';
 const TEXT_PRIMARY = '#0f172a';
 
-export default function TabsHeader({ title = '' }) {
+export default function OrderHeader({ title = 'Orders' }) {
     const insets = useSafeAreaInsets();
-
-    const isHome = title === 'Home';
 
     return (
         <BlurView
@@ -21,17 +19,12 @@ export default function TabsHeader({ title = '' }) {
         >
             <View style={styles.container}>
 
-                {/* Left — Brand ya Title */}
+                {/* Left — Title with icon */}
                 <View style={styles.leftContainer}>
-                    {isHome ? (
-                        <Text style={styles.brand}>
-                            Gig<Text style={styles.brandAccent}>Hub</Text>
-                        </Text>
-                    ) : (
-                        <Text style={styles.title}>
-                            {title.charAt(0).toUpperCase() + title.slice(1)}
-                        </Text>
-                    )}
+                    <View style={styles.titleIconWrapper}>
+                        <ShoppingCart size={20} color={ACCENT} />
+                    </View>
+                    <Text style={styles.title}>{title}</Text>
                 </View>
 
                 {/* Right — Icons */}
@@ -75,15 +68,17 @@ const styles = StyleSheet.create({
     leftContainer: {
         flexDirection: 'row',
         alignItems: 'center',
+        gap: 10,
     },
-    brand: {
-        fontSize: 26,
-        fontWeight: '800',
-        color: TEXT_PRIMARY,
-        letterSpacing: -0.5,
-    },
-    brandAccent: {
-        color: ACCENT,
+    titleIconWrapper: {
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        backgroundColor: 'rgba(255,255,255,0.65)',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.55)',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     title: {
         fontSize: 22,
@@ -101,7 +96,7 @@ const styles = StyleSheet.create({
         borderRadius: 22,
         backgroundColor: 'rgba(255,255,255,0.65)',
         borderWidth: 1,
-        borderColor: BORDER,
+        borderColor: 'rgba(255,255,255,0.55)',
         alignItems: 'center',
         justifyContent: 'center',
     },

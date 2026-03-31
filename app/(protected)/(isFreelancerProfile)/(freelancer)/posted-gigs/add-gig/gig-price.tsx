@@ -10,6 +10,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import GigHeader from "@/components/header/gig-header";
@@ -17,9 +19,7 @@ import { setGig } from "@/store/slices/gig-detail-slice";
 import { useAppDispatch } from "@/hooks/use-apply-project";
 import { packageSchema } from "@/components/schemas/schema";
 import PackageCard from "@/components/cards/gig-package-card";
-import { SafeAreaView } from "react-native-safe-area-context";
 
-/* TYPES */
 interface PackageData {
   packageType: "basic" | "standard" | "premium";
   name: string;
@@ -38,10 +38,10 @@ interface PricingFormData {
   };
 }
 
-/* MAIN COMPONENT */
 export default function PricingScreen() {
-  const router = useRouter();
-  const dispatch = useAppDispatch()
+  const router   = useRouter();
+  const dispatch = useAppDispatch();
+  const insets   = useSafeAreaInsets();
   const [expandedPackage, setExpandedPackage] = useState<"basic" | "standard" | "premium">("basic");
 
   const { control, handleSubmit, formState: { errors, isValid } } = useForm<PricingFormData>({
@@ -49,16 +49,16 @@ export default function PricingScreen() {
     mode: "onChange",
     defaultValues: {
       packages: {
-        basic: { packageType: "basic", name: "", description: "", deliveryTime: "", revisions: "", concepts: "", price: "" },
+        basic:    { packageType: "basic",    name: "", description: "", deliveryTime: "", revisions: "", concepts: "", price: "" },
         standard: { packageType: "standard", name: "", description: "", deliveryTime: "", revisions: "", concepts: "", price: "" },
-        premium: { packageType: "premium", name: "", description: "", deliveryTime: "", revisions: "", concepts: "", price: "" },
+        premium:  { packageType: "premium",  name: "", description: "", deliveryTime: "", revisions: "", concepts: "", price: "" },
       },
     },
   });
 
   const onSubmit = (data: PricingFormData) => {
-    dispatch(setGig({ packages: JSON.stringify(data.packages) }))
-    router.push('/posted-gigs/add-gig/gig-description')
+    dispatch(setGig({ packages: JSON.stringify(data.packages) }));
+    router.push('/posted-gigs/add-gig/gig-description');
   };
 
   const togglePackage = (packageName: "basic" | "standard" | "premium") => {
@@ -66,13 +66,21 @@ export default function PricingScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <LinearGradient
+      colors={['#f0f9ff', '#e0f2fe', '#bae6fd', '#7dd3fc']}
+      style={styles.gradient}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0.6, y: 1 }}
+    >
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+        <ScrollView
+          contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 16 }]}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
           <View style={styles.container}>
-            {/* Header */}
             <GigHeader title="Pricing" step="2" icon={<Ionicons name="document-text" size={24} color="#fff" />} />
-            {/* Package Cards */}
+
             {(["basic", "standard", "premium"] as const).map((pkgKey) => (
               <PackageCard
                 context="add-gigs"
@@ -86,14 +94,17 @@ export default function PricingScreen() {
               />
             ))}
 
-            {/* Footer Buttons */}
             <View style={styles.footerButtons}>
               <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
                 <Ionicons name="arrow-back" size={20} color="#fff" />
                 <Text style={styles.backText}>Back</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={[styles.continueButton, isValid && styles.continueButtonActive]} onPress={handleSubmit(onSubmit)} disabled={!isValid}>
+              <TouchableOpacity
+                style={[styles.continueButton, isValid && styles.continueButtonActive]}
+                onPress={handleSubmit(onSubmit)}
+                disabled={!isValid}
+              >
                 <Text style={styles.continueText}>Continue</Text>
                 <Ionicons name="arrow-forward" size={20} color="#fff" />
               </TouchableOpacity>
@@ -101,21 +112,39 @@ export default function PricingScreen() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </LinearGradient>
   );
 }
 
-/* STYLES */
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, 
-   backgroundColor: '#F4F4F4'
-  },
+  gradient: { flex: 1 },
   scrollContent: { flexGrow: 1, paddingBottom: 30 },
   container: { padding: 16 },
   footerButtons: { flexDirection: "row", justifyContent: "space-between", marginTop: 24, gap: 12 },
-  backButton: { backgroundColor: "#6B7280", paddingVertical: 14, paddingHorizontal: 24, borderRadius: 10, flexDirection: "row", alignItems: "center", gap: 8, flex: 1, justifyContent: "center" },
+  backButton: {
+    backgroundColor: "#6B7280",
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    flex: 1,
+    justifyContent: "center",
+  },
   backText: { color: "#fff", fontWeight: "700", fontSize: 16 },
-  continueButton: { backgroundColor: "#043A53", paddingVertical: 14, paddingHorizontal: 24, borderRadius: 10, flexDirection: "row", alignItems: "center", gap: 8, flex: 1, justifyContent: "center", opacity: 0.5 },
+  continueButton: {
+    backgroundColor: "#0d9488",
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    flex: 1,
+    justifyContent: "center",
+    opacity: 0.5,
+  },
   continueButtonActive: { opacity: 1 },
   continueText: { color: "#fff", fontWeight: "700", fontSize: 16 },
 });

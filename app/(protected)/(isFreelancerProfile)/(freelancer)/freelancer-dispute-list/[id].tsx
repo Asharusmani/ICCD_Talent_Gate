@@ -9,13 +9,20 @@ import {
     Text,
     View
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ICCDLoader from '@/components/ui/loader2';
+
+const ACCENT = '#0d9488';
+const BORDER = 'rgba(14,165,233,0.18)';
+const TEXT_PRIMARY = '#0f172a';
+const TEXT_SECONDARY = '#6b7280';
 
 const ViewDisputedList = () => {
 
   const { id } = useLocalSearchParams()
   const { data, userResponseData, isPending, isError, isLoading, error } = useGetDisputeById(id)
+  const insets = useSafeAreaInsets();
 
   if (isLoading) return <ICCDLoader />
   if (isError) return <Text>{error.message}</Text>;
@@ -23,7 +30,12 @@ const ViewDisputedList = () => {
   const { id: orderId, gigId, title, raised_by, total_price, subject, reason, disputeFilesClient } = data[0]
 
   return (
-    <SafeAreaView style={styles.container}>
+    <LinearGradient
+      colors={['#f0f9ff', '#e0f2fe', '#bae6fd', '#7dd3fc']}
+      style={styles.gradient}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0.6, y: 1 }}
+    >
       {/* <RespondToDisputeModal
         visible={true}
         onClose={() => console.log("on close button is clicked")}
@@ -31,7 +43,7 @@ const ViewDisputedList = () => {
       /> */}
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 60 }]}
       >
         {/* CARD 1: Order Summary */}
         <View style={styles.card}>
@@ -56,7 +68,6 @@ const ViewDisputedList = () => {
               <Text style={styles.label}>Gig ID</Text>
               <Text style={[styles.value, styles.greenText]}>{gigId}</Text>
             </View>
-
           </View>
 
           <Text style={styles.footerText}>Payment Status: No action taken yet</Text>
@@ -120,19 +131,16 @@ const ViewDisputedList = () => {
               ))}
             </View>
           </View>
-        )
-        }
+        )}
 
       </ScrollView>
-
-    </SafeAreaView>
+    </LinearGradient>
   );
 };
 
-
 const styles = StyleSheet.create({
-  container: { flex: 1, 
-    backgroundColor: '#F4F4F4'
+  gradient: {
+    flex: 1,
   },
   header: { paddingHorizontal: 20, paddingTop: 10, paddingBottom: 20 },
   backButton: { width: 40, height: 40, borderRadius: 10, backgroundColor: '#8CB4B8', justifyContent: 'center', alignItems: 'center', marginBottom: 20 },
@@ -141,38 +149,51 @@ const styles = StyleSheet.create({
   orderCreatedText: { fontSize: 13, color: '#0B3040', marginTop: 4 },
   statusBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#DCE7EE', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 20 },
   statusText: { fontSize: 14, color: '#4A6173', marginLeft: 5, fontWeight: '500' },
-  scrollContent: { paddingHorizontal: 16, paddingBottom: 30 },
-  card: { backgroundColor: 'white', borderRadius: 12, padding: 20, marginBottom: 16, elevation: 10, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.4, shadowRadius: 2 },
-  cardTitle: { fontSize: 18, fontWeight: 'bold', color: '#0B3040', marginBottom: 12 },
-  orderDescription: { fontSize: 14, color: '#7E8A96', lineHeight: 20, marginBottom: 20 },
+  scrollContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 40,
+  },
+  card: {
+    backgroundColor: 'rgba(255,255,255,0.82)',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 14,
+    borderWidth: 1,
+    borderColor: BORDER,
+  },
+  cardTitle: { fontSize: 16, fontWeight: '700', color: TEXT_PRIMARY, marginBottom: 12 },
+  orderDescription: { fontSize: 14, color: TEXT_SECONDARY, lineHeight: 20, marginBottom: 20 },
   dataGrid: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 },
   dataCol: { flex: 1 },
-  label: { fontSize: 14, fontWeight: 'bold', color: '#0B3040' },
-  value: { fontSize: 14, color: '#7E8A96', marginTop: 4 },
-  greenText: { color: '#2EA44F', fontWeight: '600' },
+  label: { fontSize: 13, fontWeight: '700', color: TEXT_PRIMARY },
+  value: { fontSize: 13, color: TEXT_SECONDARY, marginTop: 4 },
+  greenText: { color: '#10b981', fontWeight: '600' },
   spacer: { height: 15 },
-  footerText: { fontSize: 13, color: '#9AA5B1' },
+  footerText: { fontSize: 12, color: TEXT_SECONDARY },
   detailItem: { marginBottom: 15 },
-  detailLabel: { fontSize: 15, fontWeight: 'bold', color: '#3B556E' },
-  detailValue: { fontSize: 14, color: '#7E8A96', marginTop: 4 },
+  detailLabel: { fontSize: 13, fontWeight: '700', color: TEXT_PRIMARY },
+  detailValue: { fontSize: 13, color: TEXT_SECONDARY, marginTop: 4 },
   evidenceRow: { flexDirection: 'column', justifyContent: 'space-between', gap: 25 },
-  image: {
-    width: '100%',
-    height: 180,
-  },
+  image: { width: '100%', height: 180, borderRadius: 10 },
   evidenceContainer: { width: '48%' },
   imagePlaceholder: { aspectRatio: 1, backgroundColor: '#EAEAEA', borderRadius: 12, justifyContent: 'center', alignItems: 'center', marginBottom: 10 },
   downloadButton: { flexDirection: 'row', backgroundColor: '#2EA44F', paddingVertical: 8, borderRadius: 6, justifyContent: 'center', alignItems: 'center' },
   downloadText: { color: 'white', fontSize: 13, fontWeight: 'bold', marginLeft: 6 },
   responseHeader: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 15 },
-  responseTitle: { flex: 1, fontSize: 17, fontWeight: 'bold', color: '#0B3040', marginLeft: 10 },
-  freelancerEvidenceBox: { backgroundColor: '#EDF2F4', borderRadius: 10, padding: 12, gap: 25 },
-  evidenceLabelSmall: { fontSize: 13, fontWeight: 'bold', color: '#0B3040', marginBottom: 10 },
+  responseTitle: { flex: 1, fontSize: 15, fontWeight: '700', color: TEXT_PRIMARY, marginLeft: 10 },
+  freelancerEvidenceBox: {
+    backgroundColor: 'rgba(14,165,233,0.06)',
+    borderRadius: 12,
+    padding: 12,
+    gap: 25,
+    borderWidth: 1,
+    borderColor: BORDER,
+  },
+  evidenceLabelSmall: { fontSize: 12, fontWeight: '700', color: TEXT_SECONDARY, marginBottom: 10 },
   smallEvidenceRow: { flexDirection: 'row', justifyContent: 'space-between' },
   smallEvidenceContainer: { width: '31%' },
   smallImagePlaceholder: { aspectRatio: 1, backgroundColor: '#E2D9D9', borderRadius: 8, justifyContent: 'center', alignItems: 'center', marginBottom: 6 },
   smallDownloadText: { color: 'white', fontSize: 9, fontWeight: 'bold', marginLeft: 3 },
-
 });
 
 export default ViewDisputedList;

@@ -8,348 +8,425 @@ import {
   View,
 } from "react-native";
 import { useAppSelector } from "@/hooks/use-apply-project";
-import { CheckCircle2, XCircle } from 'lucide-react-native';
+import { CheckCircle2, XCircle, Package, Clock, ShoppingCart } from 'lucide-react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
+import { LinearGradient } from "expo-linear-gradient";
+
+const ACCENT = '#0d9488';
+const BORDER = 'rgba(14,165,233,0.18)';
+const TEXT_PRIMARY = '#0f172a';
+const TEXT_SECONDARY = '#6b7280';
 
 function OrderDetail() {
-
   const [quantity, setQuantity] = useState(1);
-  const order = useAppSelector(state => state.order.order)
+  const order = useAppSelector(state => state.order.order);
   const MIN_QTY = 1;
   const MAX_QTY = 10;
 
-  if(Object.keys(order).length ===0) return <Text>No order found...</Text>
+  if (Object.keys(order).length === 0) return <Text>No order found...</Text>;
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <ScrollView
-        contentContainerStyle={styles.container}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Package Card */}
-        <View style={styles.card}>
-          <View style={styles.packageHeader}>
-            <View style={styles.dot} />
-            <Text style={styles.packageTitle}>{order.packageType}</Text>
-            <Text style={styles.price}>${order.price}</Text>
-          </View>
+    <LinearGradient
+      colors={['#f0f9ff', '#e0f2fe', '#bae6fd', '#7dd3fc']}
+      style={styles.gradient}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0.6, y: 1 }}
+    >
+      <SafeAreaView style={styles.safe}>
+        <ScrollView
+          contentContainerStyle={styles.container}
+          showsVerticalScrollIndicator={false}
+        >
 
-          <Text style={styles.description}>
-            {order.packageDescription}
-          </Text>
-        </View>
-
-        {/* Order Frequency */}
-        <Text style={styles.sectionTitle}>ORDER FREQUENCY</Text>
-
-        <View style={styles.card}>
-          <View style={styles.frequencyRow}>
-            <View style={styles.checkCircle}>
-              <Feather name="check" size={16} color="#fff" />
+          {/* Package Card */}
+          <View style={styles.card}>
+            <View style={styles.packageHeader}>
+              <View style={styles.packageTitleRow}>
+                <View style={styles.dot} />
+                <Text style={styles.packageTitle}>{order.packageType} Package</Text>
+              </View>
+              <View style={styles.priceBadge}>
+                <Text style={styles.priceCurrency}>$</Text>
+                <Text style={styles.price}>{order.price}</Text>
+              </View>
             </View>
-            <Text style={styles.frequencyText}>Single Order</Text>
-            <Text style={styles.price}>${order.price}</Text>
+            <Text style={styles.description}>{order.packageDescription}</Text>
           </View>
-        </View>
 
-        {/* Quantity */}
-        <View style={styles.quantityHeader}>
-          <Text style={styles.sectionTitle}>QUANTITY</Text>
+          {/* Order Frequency */}
+          <Text style={styles.sectionTitle}>Order Frequency</Text>
+          <View style={styles.card}>
+            <View style={styles.frequencyRow}>
+              <View style={styles.checkCircle}>
+                <Feather name="check" size={14} color="#fff" />
+              </View>
+              <Text style={styles.frequencyText}>Single Order</Text>
+              <Text style={styles.frequencyPrice}>${order.price}</Text>
+            </View>
+          </View>
 
-          <View style={styles.quantityRow}>
-            <TouchableOpacity
-              style={[
-                styles.qtyBtn,
-                quantity === MIN_QTY && styles.disabledBtn,
-              ]}
-              disabled={quantity === MIN_QTY}
-              onPress={() => setQuantity(quantity - 1)}
+          {/* Quantity */}
+          <View style={styles.quantityHeader}>
+            <Text style={styles.sectionTitle}>Quantity</Text>
+            <View style={styles.quantityRow}>
+              <TouchableOpacity
+                style={[styles.qtyBtn, quantity === MIN_QTY && styles.disabledBtn]}
+                disabled={quantity === MIN_QTY}
+                onPress={() => setQuantity(quantity - 1)}
+              >
+                <Text style={styles.qtyText}>−</Text>
+              </TouchableOpacity>
+              <View style={styles.qtyValueBox}>
+                <Text style={styles.quantity}>{quantity}</Text>
+              </View>
+              <TouchableOpacity
+                style={[styles.qtyBtn, quantity === MAX_QTY && styles.disabledBtn]}
+                disabled={quantity === MAX_QTY}
+                onPress={() => setQuantity(quantity + 1)}
+              >
+                <Text style={styles.qtyText}>+</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Summary */}
+          <Text style={styles.sectionTitle}>Order Summary</Text>
+          <View style={styles.card}>
+            <View style={styles.summaryRow}>
+              <View style={styles.summaryIconBox}>
+                <Package size={16} color={ACCENT} />
+              </View>
+              <Text style={styles.summaryText}>{order.packageType} Package</Text>
+            </View>
+            <View style={[styles.summaryRow, { marginBottom: 0 }]}>
+              <View style={styles.summaryIconBox}>
+                <Clock size={16} color={ACCENT} />
+              </View>
+              <Text style={styles.summaryText}>{order.deliveryTime} Days Delivery</Text>
+            </View>
+          </View>
+
+          {/* Features */}
+          <Text style={styles.sectionTitle}>What's Included</Text>
+          <View style={styles.card}>
+            {Object.entries(JSON.parse(order.packages)).map(([key, value], index) => (
+              <View
+                key={index}
+                style={[
+                  styles.featureRow,
+                  index === Object.entries(JSON.parse(order.packages)).length - 1 && { marginBottom: 0 }
+                ]}
+              >
+                {value
+                  ? <CheckCircle2 size={18} color={ACCENT} fill="rgba(13,148,136,0.12)" />
+                  : <XCircle size={18} color="#d1d5db" />
+                }
+                <Text style={[styles.featureText, !value && styles.featureTextDisabled]}>
+                  {key.replaceAll('_', ' ')}
+                </Text>
+              </View>
+            ))}
+          </View>
+
+          {/* Price Breakdown */}
+          <View style={styles.priceCard}>
+            <View style={styles.priceRow}>
+              <Text style={styles.subtotalLabel}>Subtotal ({quantity} × ${Number(order.price)})</Text>
+              <Text style={styles.subtotalValue}>${quantity * Number(order.price)}</Text>
+            </View>
+            <View style={styles.divider} />
+            <View style={styles.totalRow}>
+              <Text style={styles.totalLabel}>Total</Text>
+              <Text style={styles.totalPrice}>${quantity * Number(order.price)}</Text>
+            </View>
+          </View>
+
+          {/* Button */}
+          <TouchableOpacity
+            style={styles.primaryBtnWrapper}
+            activeOpacity={0.85}
+          >
+            <LinearGradient
+              colors={[ACCENT, '#0891b2']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.primaryBtn}
             >
-              <Text style={styles.qtyText}>−</Text>
-            </TouchableOpacity>
+              <ShoppingCart size={20} color="#fff" />
+              <Text style={styles.buttonText}>Continue to Payment</Text>
+            </LinearGradient>
+          </TouchableOpacity>
 
-            <View style={styles.qtyValueBox}>
-              <Text style={styles.quantity}>{quantity}</Text>
-            </View>
-
-            <TouchableOpacity
-              style={[
-                styles.qtyBtn,
-                quantity === MAX_QTY && styles.disabledBtn,
-              ]}
-              disabled={quantity === MAX_QTY}
-              onPress={() => setQuantity(quantity + 1)}
-            >
-              <Text style={styles.qtyText}>+</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-
-        {/* Summary */}
-        <View style={styles.summaryCard}>
-          <View style={styles.summaryRow}>
-            <MaterialIcons name="inventory-2" size={22} color="#3C9D8D" />
-            <Text style={styles.summaryText}>{order.packageType} Package</Text>
-          </View>
-
-          <View style={styles.summaryRow}>
-            <Feather name="clock" size={22} color="#3C9D8D" />
-            <Text style={styles.summaryText}>{order.deliveryTime} Days Delivery</Text>
-          </View>
-
-          {/* <View style={styles.summaryRow}>
-            <Feather name="rotate-ccw" size={22} color="#3C9D8D" />
-            <Text style={styles.summaryText}>3 Revisions</Text>
-          </View> */}
-        </View>
-
-        <View style={styles.featureContainer}>
-          {Object.entries(JSON.parse(order.packages)).map(([key, value], index) => (
-            <View key={index} style={[styles.summaryRow, { paddingLeft: 10 }]}>
-              {value ?
-                <CheckCircle2 size={25} color="#147D7E" fill="#E8F2F2" />
-                :
-                <XCircle size={25} color="#B0B0B0" />
-              }
-              <Text style={styles.summaryText}>{key.replaceAll("_", " ")}</Text>
-            </View>
-          ))}
-        </View>
-
-        {/* Price */}
-        <View style={styles.priceRow}>
-          <Text style={styles.subtotal}>
-            Subtotal ({quantity} × ${Number(order.price)})
-          </Text>
-          <Text style={styles.subtotal}>${quantity * Number(order.price)}</Text>
-        </View>
-
-        <View style={styles.divider} />
-
-        <View style={styles.totalRow}>
-          <Text style={styles.totalLabel}>Total Price</Text>
-          <Text style={styles.totalPrice}>${quantity * Number(order.price)}</Text>
-        </View>
-
-        {/* Button */}
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Continue to Payment</Text>
-        </TouchableOpacity>
-
-      </ScrollView>
-    </SafeAreaView>
+          <View style={{ height: 20 }} />
+        </ScrollView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 }
 
 export default OrderDetail;
 
 const styles = StyleSheet.create({
+  gradient: {
+    flex: 1,
+  },
   safe: {
     flex: 1,
-    backgroundColor: '#F4F4F4'
+    backgroundColor: 'transparent',
   },
-
   container: {
-    padding: 20,
+    padding: 16,
+    paddingTop: 8,
   },
 
+  // Card
   card: {
-    backgroundColor: "#F7FCFB",
+    backgroundColor: 'rgba(255,255,255,0.82)',
     borderRadius: 16,
     padding: 16,
     marginBottom: 20,
-    borderWidth: 2,
-    borderColor: "#9AD1C7",
-
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 3,
+    borderWidth: 1,
+    borderColor: BORDER,
   },
 
+  // Package
   packageHeader: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: 10,
   },
-
+  packageTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
   dot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: "#3C9D8D",
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: ACCENT,
     marginRight: 10,
   },
-
   packageTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    flex: 1,
-    color: "#0F172A",
-    textTransform: 'capitalize'
+    fontSize: 16,
+    fontWeight: '700',
+    color: TEXT_PRIMARY,
+    textTransform: 'capitalize',
   },
-
+  priceBadge: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: 'rgba(13,148,136,0.10)',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(13,148,136,0.20)',
+  },
+  priceCurrency: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: ACCENT,
+    marginTop: 3,
+  },
   price: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#3C9D8D",
+    fontSize: 20,
+    fontWeight: '800',
+    color: ACCENT,
   },
-
   description: {
-    fontSize: 14,
-    lineHeight: 22,
-    color: "#475569",
+    fontSize: 13,
+    lineHeight: 20,
+    color: TEXT_SECONDARY,
   },
 
+  // Section title
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: "600",
+    fontSize: 13,
+    fontWeight: '700',
+    color: TEXT_SECONDARY,
     marginBottom: 10,
-    color: "#0F172A",
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
   },
 
+  // Frequency
   frequencyRow: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-
   checkCircle: {
     width: 26,
     height: 26,
     borderRadius: 13,
-    backgroundColor: "#3C9D8D",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: ACCENT,
+    justifyContent: 'center',
+    alignItems: 'center',
     marginRight: 12,
   },
-
   frequencyText: {
     flex: 1,
-    fontSize: 16,
-    color: "#0F172A",
+    fontSize: 14,
+    fontWeight: '600',
+    color: TEXT_PRIMARY,
+  },
+  frequencyPrice: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: ACCENT,
   },
 
+  // Quantity
   quantityHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 24,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
   },
-
   quantityRow: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-
-
   qtyBtn: {
-    width: 44,
-    height: 44,
+    width: 40,
+    height: 40,
     borderRadius: 10,
-    backgroundColor: "#F1F5F9",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: 'rgba(255,255,255,0.82)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: BORDER,
   },
-
   disabledBtn: {
     opacity: 0.4,
   },
-
   qtyValueBox: {
-    minWidth: 60,
-    height: 44,
+    minWidth: 52,
+    height: 40,
     borderRadius: 10,
-    backgroundColor: "#FFFFFF",
-    justifyContent: "center",
-    alignItems: "center",
-    marginHorizontal: 16,
+    backgroundColor: 'rgba(255,255,255,0.95)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 10,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: BORDER,
   },
-
   qtyText: {
-    fontSize: 22,
-    fontWeight: "600",
+    fontSize: 20,
+    fontWeight: '600',
+    color: TEXT_PRIMARY,
   },
-
   quantity: {
-    fontSize: 18,
-    fontWeight: "600",
+    fontSize: 16,
+    fontWeight: '700',
+    color: TEXT_PRIMARY,
   },
 
-  summaryCard: {
-    backgroundColor: "#F8FAFC",
+  // Summary
+  summaryRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    gap: 12,
+  },
+  summaryIconBox: {
+    width: 32,
+    height: 32,
+    borderRadius: 9,
+    backgroundColor: 'rgba(13,148,136,0.10)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  summaryText: {
+    fontSize: 14,
+    color: TEXT_PRIMARY,
+    fontWeight: '500',
+    textTransform: 'capitalize',
+  },
+
+  // Features
+  featureRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 11,
+  },
+  featureText: {
+    fontSize: 14,
+    color: TEXT_PRIMARY,
+    fontWeight: '500',
+    textTransform: 'capitalize',
+  },
+  featureTextDisabled: {
+    color: '#d1d5db',
+  },
+
+  // Price breakdown
+  priceCard: {
+    backgroundColor: 'rgba(255,255,255,0.82)',
     borderRadius: 16,
     padding: 16,
     marginBottom: 20,
+    borderWidth: 1,
+    borderColor: BORDER,
   },
-
-  summaryRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 12,
-  },
-
-  featureContainer: {
-    flexDirection: "column",
-    justifyContent: "center",
-    backgroundColor: "#F8FAFC",
-    paddingTop: 10
-  },
-
-  summaryText: {
-    marginLeft: 12,
-    fontSize: 15,
-    color: "#334155",
-    textTransform: "capitalize"
-  },
-
   priceRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
   },
-
-  subtotal: {
-    fontSize: 15,
-    color: "#334155",
+  subtotalLabel: {
+    fontSize: 13,
+    color: TEXT_SECONDARY,
   },
-
+  subtotalValue: {
+    fontSize: 13,
+    color: TEXT_SECONDARY,
+    fontWeight: '600',
+  },
   divider: {
     height: 1,
-    backgroundColor: "#E2E8F0",
-    marginVertical: 10,
+    backgroundColor: BORDER,
+    marginBottom: 10,
   },
-
   totalRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
-
   totalLabel: {
-    fontSize: 18,
-    fontWeight: "700",
-  },
-
-  totalPrice: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: "#3C9D8D",
-  },
-
-  button: {
-    backgroundColor: "#3C9D8D",
-    paddingVertical: 16,
-    borderRadius: 14,
-    alignItems: "center",
-  },
-
-  buttonText: {
-    color: "#FFFFFF",
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: '700',
+    color: TEXT_PRIMARY,
+  },
+  totalPrice: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: ACCENT,
+  },
+
+  // Button
+  primaryBtnWrapper: {
+    borderRadius: 14,
+    overflow: 'hidden',
+    shadowColor: ACCENT,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  primaryBtn: {
+    flexDirection: 'row',
+    height: 54,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 10,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
+    letterSpacing: 0.3,
   },
 });

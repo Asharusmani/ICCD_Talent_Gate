@@ -1,5 +1,6 @@
 import ChatHeader from '@/components/header/detail-header';
 import TabsHeader from '@/components/header/tabs-header';
+import TabsFreelancerHeader from '@/components/header/tabs-header-freelancer';
 import { Stack, useRouter } from 'expo-router';
 
 export default function ProjectLayout() {
@@ -8,7 +9,8 @@ export default function ProjectLayout() {
     <Stack
       screenOptions={{
         headerShown: true,
-        header: () => <TabsHeader />
+        headerTransparent: true,
+         header: ({ options }) => <TabsFreelancerHeader title={options.title ?? ''} />
       }}
     >
       <Stack.Screen name="index" options={{ title: "Posted Project" }} />

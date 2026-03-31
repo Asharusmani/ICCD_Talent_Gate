@@ -2,310 +2,404 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Controller, useForm } from 'react-hook-form';
 import * as DocumentPicker from 'expo-document-picker';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useApplyJob } from '@/api/client/job';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { User, Mail, Briefcase, FileText } from 'lucide-react-native';
 
+const ACCENT = '#0d9488';
+const BORDER = 'rgba(14,165,233,0.18)';
+const TEXT_PRIMARY = '#0f172a';
+const TEXT_SECONDARY = '#6b7280';
 
 const createApplyjobSchema: yup.ObjectSchema<ApplyJobForm> = yup.object({
-  name: yup.string().required('Full name is required'),
-  email: yup.string().email('Invalid email').required('Email is required'),
-  experience: yup
-    .string()
-    .matches(/^\d+$/, 'Experience must be a number')
-    .required('Experience is required'),
-  files: yup
-    .mixed<DocumentPicker.DocumentPickerAsset>()
-    .nullable()
-    .required('CV is required'),
+    name: yup.string().required('Full name is required'),
+    email: yup.string().email('Invalid email').required('Email is required'),
+    experience: yup
+        .string()
+        .matches(/^\d+$/, 'Experience must be a number')
+        .required('Experience is required'),
+    files: yup
+        .mixed<DocumentPicker.DocumentPickerAsset>()
+        .nullable()
+        .required('CV is required'),
 });
 
-
 type ApplyJobForm = {
-  name: string;
-  email: string;
-  experience: string;
-  files: DocumentPicker.DocumentPickerAsset | null;
+    name: string;
+    email: string;
+    experience: string;
+    files: DocumentPicker.DocumentPickerAsset | null;
 };
 
 export default function ApplyJob() {
+    const router = useRouter();
+    const insets = useSafeAreaInsets();
+    const { freelancerId, projectId, clientId } = useLocalSearchParams();
 
-  const router = useRouter();
-  const { freelancerId, projectId, clientId } = useLocalSearchParams()
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<ApplyJobForm>({
-    resolver: yupResolver(createApplyjobSchema),
-    defaultValues: {
-      name: '',
-      email: '',
-      experience: '',
-      files: null,
-    },
-  });
+    const {
+        control,
+        handleSubmit,
+        formState: { errors },
+    } = useForm<ApplyJobForm>({
+        resolver: yupResolver(createApplyjobSchema),
+        defaultValues: {
+            name: '',
+            email: '',
+            experience: '',
+            files: null,
+        },
+    });
 
-  const { submitJob, isPending, isError, error } = useApplyJob();
+    const { submitJob, isPending } = useApplyJob();
 
-  const onSubmit = (data: any) => {
-    const formData = new FormData();
+    const onSubmit = (data: any) => {
+        const formData = new FormData();
+        formData.append('name', data.name);
+        formData.append('email', data.email);
+        formData.append('experience', data.experience);
+        formData.append('freelancerId', freelancerId);
+        formData.append('projectId', projectId);
+        formData.append('clientId', clientId);
+        if (data.files) {
+            formData.append('files', {
+                uri: data.files.uri,
+                type: data.files.mimeType || 'application/pdf',
+                name: data.files.name,
+            } as any);
+        }
+        submitJob(formData);
+        router.back();
+    };
 
-    formData.append('name', data.name);
-    formData.append('email', data.email);
-    formData.append('experience', data.experience);
-    formData.append('freelancerId', freelancerId);
-    formData.append('projectId', projectId);
-    formData.append('clientId', clientId);
-
-    if (data.files) {
-      formData.append('files', {
-        uri: data.files.uri,
-        type: data.files.mimeType || 'application/pdf',
-        name: data.files.name,
-      } as any);
-    }
-    submitJob(formData)
-    router.back()
-  };
-
-  return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <Stack.Screen
-        options={{
-          headerShown: true,
-          title: 'Apply Position',
-          headerStyle: { backgroundColor: '#109f93ff' },
-          headerTintColor: '#fff',
-        }}
-      />
-
-      <ScrollView contentContainerStyle={styles.body} showsVerticalScrollIndicator={false}>
-        {/* Full Name */}
-        <Text style={styles.label}>Full Name</Text>
-        <Controller
-          control={control}
-          name="name"
-          render={({ field: { onChange, value } }) => (
-            <TextInput
-              style={styles.input}
-              value={value}
-              onChangeText={onChange}
-              placeholder="Enter full name"
-              placeholderTextColor="#A0A0A0"
-            />
-          )}
-        />
-        {errors.name && <Text style={styles.error}>{errors.name.message}</Text>}
-
-        {/* Email */}
-        <Text style={styles.label}>Email</Text>
-        <Controller
-          control={control}
-          name="email"
-          render={({ field: { onChange, value } }) => (
-            <TextInput
-              style={styles.input}
-              value={value}
-              onChangeText={onChange}
-              placeholder="Enter email address"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              placeholderTextColor="#A0A0A0"
-            />
-          )}
-        />
-        {errors.email && <Text style={styles.error}>{errors.email.message}</Text>}
-
-        {/* Experience */}
-        <Text style={styles.label}>Year of experience</Text>
-        <Controller
-          control={control}
-          name="experience"
-          render={({ field: { onChange, value } }) => (
-            <TextInput
-              style={styles.input}
-              value={String(value)}
-              onChangeText={onChange}
-              placeholder="e.g. 5"
-              keyboardType="numeric"
-              placeholderTextColor="#A0A0A0"
-            />
-          )}
-        />
-        {errors.experience && <Text style={styles.error}>{errors.experience.message}</Text>}
-
-        {/* Upload CV */}
-        <Controller
-          control={control}
-          name="files"
-          render={({ field: { onChange, value } }) => (
-            <>
-              <TouchableOpacity
-                style={styles.uploadContainer}
-                activeOpacity={0.7}
-                onPress={async () => {
-                  const result = await DocumentPicker.getDocumentAsync({
-                    type: [
-                      'application/pdf',
-                      'application/msword',
-                      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                    ],
-                  });
-
-                  if (!result.canceled) {
-                    onChange(result.assets[0]);
-                  }
-                }}
-              >
-                <MaterialCommunityIcons
-                  name="upload-network-outline"
-                  size={40}
-                  color="#4A7A7C"
-                />
-
-                <Text style={styles.uploadText}>
-                  {value ? value.name : 'Click to upload CV'}
-                </Text>
-              </TouchableOpacity>
-
-              {errors.files && <Text style={styles.error}>{errors.files.message}</Text>}
-            </>
-          )}
-        />
-        {/* Buttons */}
-        <View style={styles.footer}>
-          <TouchableOpacity
-            style={styles.cancelButton}
-            activeOpacity={0.8}
-            onPress={() => router.back()}
-          >
-            <Text style={styles.cancelButtonText}>Back</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.flexButton}
-            activeOpacity={0.8}
-            onPress={handleSubmit(onSubmit)}
-          >
-            <LinearGradient
-              colors={['#15A9B2', '#115B60']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.gradientButton}
+    return (
+        <LinearGradient
+            colors={['#f0f9ff', '#e0f2fe', '#bae6fd', '#7dd3fc']}
+            style={{ flex: 1 }}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 0.6, y: 1 }}
+        >
+            <KeyboardAvoidingView
+                style={{ flex: 1 }}
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             >
-              <Text style={styles.gradientButtonText}>Submit</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
-  );
+                <ScrollView
+                    contentContainerStyle={[styles.scrollContent, { paddingTop:  16 }]}
+                    showsVerticalScrollIndicator={false}
+                >
+                    {/* Hero */}
+                    <LinearGradient
+                        colors={[ACCENT, '#0891b2']}
+                        style={styles.heroCard}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 1 }}
+                    >
+                        <View style={styles.heroIconBox}>
+                            <Briefcase size={26} color="#fff" />
+                        </View>
+                        <Text style={styles.heroTitle}>Apply for Position</Text>
+                        <Text style={styles.heroSub}>Fill in your details to submit your application.</Text>
+                    </LinearGradient>
+
+                    {/* Form Card */}
+                    <View style={styles.card}>
+
+                        {/* Full Name */}
+                        <View style={styles.inputGroup}>
+                            <Text style={styles.label}>Full Name *</Text>
+                            <Controller
+                                control={control}
+                                name="name"
+                                render={({ field: { onChange, value } }) => (
+                                    <View style={[styles.inputRow, errors.name && styles.inputError]}>
+                                        <User size={16} color={TEXT_SECONDARY} style={{ flexShrink: 0 }} />
+                                        <TextInput
+                                            style={styles.input}
+                                            value={value}
+                                            onChangeText={onChange}
+                                            placeholder="Enter full name"
+                                            placeholderTextColor="rgba(15,23,42,0.30)"
+                                        />
+                                    </View>
+                                )}
+                            />
+                            {errors.name && <Text style={styles.error}>{errors.name.message}</Text>}
+                        </View>
+
+                        {/* Email */}
+                        <View style={styles.inputGroup}>
+                            <Text style={styles.label}>Email *</Text>
+                            <Controller
+                                control={control}
+                                name="email"
+                                render={({ field: { onChange, value } }) => (
+                                    <View style={[styles.inputRow, errors.email && styles.inputError]}>
+                                        <Mail size={16} color={TEXT_SECONDARY} style={{ flexShrink: 0 }} />
+                                        <TextInput
+                                            style={styles.input}
+                                            value={value}
+                                            onChangeText={onChange}
+                                            placeholder="Enter email address"
+                                            keyboardType="email-address"
+                                            autoCapitalize="none"
+                                            placeholderTextColor="rgba(15,23,42,0.30)"
+                                        />
+                                    </View>
+                                )}
+                            />
+                            {errors.email && <Text style={styles.error}>{errors.email.message}</Text>}
+                        </View>
+
+                        {/* Experience */}
+                        <View style={styles.inputGroup}>
+                            <Text style={styles.label}>Years of Experience *</Text>
+                            <Controller
+                                control={control}
+                                name="experience"
+                                render={({ field: { onChange, value } }) => (
+                                    <View style={[styles.inputRow, errors.experience && styles.inputError]}>
+                                        <Briefcase size={16} color={TEXT_SECONDARY} style={{ flexShrink: 0 }} />
+                                        <TextInput
+                                            style={styles.input}
+                                            value={String(value)}
+                                            onChangeText={onChange}
+                                            placeholder="e.g. 5"
+                                            keyboardType="numeric"
+                                            placeholderTextColor="rgba(15,23,42,0.30)"
+                                        />
+                                    </View>
+                                )}
+                            />
+                            {errors.experience && <Text style={styles.error}>{errors.experience.message}</Text>}
+                        </View>
+
+                        {/* Upload CV */}
+                        <View style={styles.inputGroup}>
+                            <Text style={styles.label}>Upload CV *</Text>
+                            <Controller
+                                control={control}
+                                name="files"
+                                render={({ field: { onChange, value } }) => (
+                                    <>
+                                        <TouchableOpacity
+                                            style={[styles.uploadBox, errors.files && styles.inputError]}
+                                            activeOpacity={0.7}
+                                            onPress={async () => {
+                                                const result = await DocumentPicker.getDocumentAsync({
+                                                    type: [
+                                                        'application/pdf',
+                                                        'application/msword',
+                                                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                                                    ],
+                                                });
+                                                if (!result.canceled) onChange(result.assets[0]);
+                                            }}
+                                        >
+                                            <View style={styles.uploadIconBox}>
+                                                <MaterialCommunityIcons
+                                                    name="upload-network-outline"
+                                                    size={26}
+                                                    color={value ? ACCENT : TEXT_SECONDARY}
+                                                />
+                                            </View>
+                                            <Text style={[styles.uploadText, value && { color: ACCENT, fontWeight: '600' }]}>
+                                                {value ? value.name : 'Click to upload CV'}
+                                            </Text>
+                                            <Text style={styles.uploadSub}>PDF, DOC, DOCX</Text>
+                                        </TouchableOpacity>
+                                        {errors.files && <Text style={styles.error}>{errors.files.message}</Text>}
+                                    </>
+                                )}
+                            />
+                        </View>
+                    </View>
+
+                    {/* Buttons */}
+                    <View style={styles.footer}>
+                        <TouchableOpacity
+                            style={styles.backBtn}
+                            activeOpacity={0.8}
+                            onPress={() => router.back()}
+                        >
+                            <Text style={styles.backBtnText}>Back</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={styles.submitWrapper}
+                            activeOpacity={0.85}
+                            onPress={handleSubmit(onSubmit)}
+                            disabled={isPending}
+                        >
+                            <LinearGradient
+                                colors={[ACCENT, '#0891b2']}
+                                style={styles.submitBtn}
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 1, y: 0 }}
+                            >
+                                <Text style={styles.submitText}>
+                                    {isPending ? 'Submitting...' : 'Submit Application'}
+                                </Text>
+                            </LinearGradient>
+                        </TouchableOpacity>
+                    </View>
+
+                    <View style={{ height: 40 }} />
+                </ScrollView>
+            </KeyboardAvoidingView>
+        </LinearGradient>
+    );
 }
 
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F4F4F4'
-  },
-  body: { padding: 20 },
-
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
-  },
-
-  input: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    paddingVertical: 12,
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-    fontSize: 14,
-    color: '#000',
-  },
-
-  error: {
-    color: 'red',
-    fontSize: 12,
-    marginTop: -15,
-    marginBottom: 10,
-  },
-
-  uploadContainer: {
-    borderWidth: 1,
-    borderColor: '#B0B0B0',
-    borderStyle: 'dashed',
-    borderRadius: 10,
-    height: 140,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.5)',
-    marginBottom: 30,
-  },
-
-  uploadText: {
-    fontSize: 12,
-    color: '#808080',
-    marginTop: 10,
-    textAlign: 'center',
-  },
-
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingBottom: 10,
-  },
-
-  cancelButton: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#21818B',
-    borderRadius: 10,
-    paddingVertical: 12,
-    marginRight: 5,
-    alignItems: 'center',
-  },
-
-  cancelButtonText: {
-    color: '#21818B',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-
-  flexButton: {
-    flex: 1,
-    marginLeft: 5,
-  },
-
-  gradientButton: {
-    paddingVertical: 12,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-
-  gradientButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
+    scrollContent: {
+        paddingHorizontal: 16,
+        paddingBottom: 20,
+    },
+    heroCard: {
+        borderRadius: 20,
+        padding: 22,
+        marginBottom: 16,
+        alignItems: 'center',
+    },
+    heroIconBox: {
+        width: 54,
+        height: 54,
+        borderRadius: 27,
+        backgroundColor: 'rgba(255,255,255,0.20)',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 12,
+    },
+    heroTitle: {
+        fontSize: 22,
+        fontWeight: '800',
+        color: '#fff',
+        letterSpacing: -0.3,
+        marginBottom: 6,
+    },
+    heroSub: {
+        fontSize: 13,
+        color: 'rgba(255,255,255,0.80)',
+        textAlign: 'center',
+    },
+    card: {
+        backgroundColor: 'rgba(255,255,255,0.88)',
+        borderRadius: 18,
+        borderWidth: 1,
+        borderColor: BORDER,
+        padding: 16,
+        marginBottom: 14,
+        gap: 14,
+    },
+    inputGroup: {
+        gap: 6,
+    },
+    label: {
+        fontSize: 13,
+        fontWeight: '700',
+        color: TEXT_PRIMARY,
+    },
+    inputRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255,255,255,0.85)',
+        borderWidth: 1,
+        borderColor: BORDER,
+        borderRadius: 12,
+        paddingHorizontal: 12,
+        paddingVertical: 4,
+        gap: 8,
+    },
+    input: {
+        flex: 1,
+        fontSize: 14,
+        color: TEXT_PRIMARY,
+        paddingVertical: 10,
+    },
+    inputError: {
+        borderColor: '#ef4444',
+    },
+    error: {
+        fontSize: 12,
+        color: '#ef4444',
+        fontWeight: '600',
+    },
+    uploadBox: {
+        borderWidth: 1.5,
+        borderColor: BORDER,
+        borderStyle: 'dashed',
+        borderRadius: 14,
+        padding: 20,
+        alignItems: 'center',
+        gap: 6,
+        backgroundColor: 'rgba(255,255,255,0.70)',
+    },
+    uploadIconBox: {
+        width: 48,
+        height: 48,
+        borderRadius: 14,
+        backgroundColor: 'rgba(13,148,136,0.10)',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    uploadText: {
+        fontSize: 14,
+        color: TEXT_SECONDARY,
+        textAlign: 'center',
+        fontWeight: '500',
+    },
+    uploadSub: {
+        fontSize: 11,
+        color: 'rgba(15,23,42,0.35)',
+    },
+    footer: {
+        flexDirection: 'row',
+        gap: 12,
+    },
+    backBtn: {
+        flex: 1,
+        borderWidth: 1.5,
+        borderColor: BORDER,
+        borderRadius: 12,
+        paddingVertical: 14,
+        alignItems: 'center',
+        backgroundColor: 'rgba(255,255,255,0.75)',
+    },
+    backBtnText: {
+        color: TEXT_PRIMARY,
+        fontWeight: '700',
+        fontSize: 15,
+    },
+    submitWrapper: {
+        flex: 2,
+        borderRadius: 12,
+        overflow: 'hidden',
+        shadowColor: ACCENT,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 6,
+    },
+    submitBtn: {
+        paddingVertical: 14,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    submitText: {
+        color: '#fff',
+        fontWeight: '800',
+        fontSize: 15,
+    },
 });

@@ -1,6 +1,7 @@
 // app/(client)/gigs/_layout.tsx
 import ChatHeader from '@/components/header/detail-header';
 import TabsHeader from '@/components/header/tabs-header';
+import TabsFreelancerHeader from '@/components/header/tabs-header-freelancer';
 import { Stack, useRouter } from 'expo-router';
 
 export default function JobLayout() {
@@ -9,7 +10,8 @@ export default function JobLayout() {
     <Stack
       screenOptions={{
         headerShown: true,
-        header: () => <TabsHeader />
+        headerTransparent: true,
+         header: ({ options }) => <TabsFreelancerHeader title={options.title ?? ''} />
       }}
     >
       <Stack.Screen name="index" options={{ title: "Jobs" }} />

@@ -1,8 +1,6 @@
 import { Stack } from 'expo-router';
 import { useRouter } from 'expo-router';
-import { TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import TabsHeader from '@/components/header/tabs-header';
+import TabsFreelancerHeader from '@/components/header/tabs-header-freelancer';
 
 export default function PostedGigsLayout() {
     const router = useRouter();
@@ -10,12 +8,15 @@ export default function PostedGigsLayout() {
         <Stack
             screenOptions={{
                 headerShown: true,
-                header: () => <TabsHeader />
+                headerTransparent: true,
+                header: ({ options }) => (
+                    <TabsFreelancerHeader title={options.title ?? ''} />
+                ),
             }}
         >
-            <Stack.Screen name="index" options={{ title: "Posted Gigs", headerShown: true }} />
-            <Stack.Screen name="add-gig" options={{ title: "Add Gigs", headerShown: false }} />
-            <Stack.Screen name="[id]" options={{ title: "Edit Gigs", headerShown: false }} />
+            <Stack.Screen name="index" options={{ title: "Posted Gigs" }} />
+            <Stack.Screen name="add-gig" options={{ headerShown: false }} />
+            <Stack.Screen name="[id]" options={{ headerShown: false }} />
         </Stack>
     );
 }

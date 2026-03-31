@@ -1,174 +1,279 @@
 import { useGetDisputeById } from '@/api/client/dispute';
 import ButtonRN from '@/components/ui/button';
-import {
-  MaterialCommunityIcons
-} from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import {
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ICCDLoader from '@/components/ui/loader2';
+import {
+  FileText, DollarSign, Hash, Info,
+  MessageCircle, Paperclip, AlertTriangle
+} from 'lucide-react-native';
+
+const ACCENT = '#0d9488';
+const BORDER = 'rgba(14,165,233,0.18)';
+const TEXT_PRIMARY = '#0f172a';
+const TEXT_SECONDARY = '#6b7280';
 
 const ViewDisputedList = () => {
-
   const router = useRouter();
-  const { id } = useLocalSearchParams()
-  const { data, userResponseData, isPending, isError, isLoading, error } = useGetDisputeById(id)
+  const { id } = useLocalSearchParams();
+  const { data, userResponseData, isPending, isError, isLoading, error } = useGetDisputeById(id);
+  const insets = useSafeAreaInsets();
 
-  if (isLoading) return <ICCDLoader />
+  if (isLoading) return <ICCDLoader />;
   if (isError) return error.message;
 
-  const { id: orderId, gigId, raised_by, title, total_price, subject, reason, disputeFilesClient } = data[0]
+  const { id: orderId, gigId, raised_by, title, total_price, subject, reason, disputeFilesClient } = data[0];
+
+  const SectionCard = ({ icon, title, children }: any) => (
+    <View style={styles.card}>
+      <View style={styles.cardHeader}>
+        <View style={styles.cardIconBox}>{icon}</View>
+        <Text style={styles.cardTitle}>{title}</Text>
+      </View>
+      <View style={styles.cardBody}>{children}</View>
+    </View>
+  );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <LinearGradient
+      colors={['#f0f9ff', '#e0f2fe', '#bae6fd', '#7dd3fc']}
+      style={styles.gradient}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0.6, y: 1 }}
+    >
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 60 }]}
       >
-        {/* CARD 1: Order Summary */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Order Summary</Text>
-          <Text style={styles.orderDescription}>
-            {title}
-          </Text>
 
-          <View style={styles.dataGrid}>
-            <View style={styles.dataCol}>
-              <Text style={styles.label}>Total Amount</Text>
-              <Text style={styles.value}>{total_price}</Text>
-              <View style={styles.spacer} />
-              <Text style={styles.label}>Order ID</Text>
-              <Text style={styles.value}>{orderId}</Text>
-            </View>
-
-            <View style={styles.dataCol}>
-              <Text style={styles.label}>Paid Amount</Text>
-              <Text style={[styles.value, styles.greenText]}>$50.0</Text>
-              <View style={styles.spacer} />
-              <Text style={styles.label}>Gig ID</Text>
-              <Text style={[styles.value, styles.greenText]}>{gigId}</Text>
-            </View>
-
+        {/* Hero */}
+        <LinearGradient
+          colors={[ACCENT, '#0891b2']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.heroCard}
+        >
+          <View style={styles.statusBadge}>
+            <View style={styles.statusDot} />
+            <Text style={styles.statusText}>Under Review</Text>
           </View>
+          <Text style={styles.heroTitle}>{title}</Text>
+          <Text style={styles.heroSub}>Payment Status: No action taken yet</Text>
+        </LinearGradient>
 
-          <Text style={styles.footerText}>Payment Status: No action taken yet</Text>
-        </View>
+        {/* Order Summary */}
+        <SectionCard icon={<FileText size={18} color={ACCENT} />} title="Order Summary">
+          <View style={styles.statsGrid}>
+            <View style={styles.statBox}>
+              <View style={styles.statIconBox}>
+                <DollarSign size={16} color={ACCENT} />
+              </View>
+              <Text style={styles.statLabel}>Total Amount</Text>
+              <Text style={styles.statValue}>{total_price}</Text>
+            </View>
+            <View style={styles.statDivider} />
+            <View style={styles.statBox}>
+              <View style={styles.statIconBox}>
+                <DollarSign size={16} color="#10b981" />
+              </View>
+              <Text style={styles.statLabel}>Paid Amount</Text>
+              <Text style={[styles.statValue, { color: '#10b981' }]}>$50.0</Text>
+            </View>
+            <View style={styles.statDivider} />
+            <View style={styles.statBox}>
+              <View style={styles.statIconBox}>
+                <Hash size={16} color={ACCENT} />
+              </View>
+              <Text style={styles.statLabel}>Order ID</Text>
+              <Text style={styles.statValue} numberOfLines={1}>{orderId}</Text>
+            </View>
+          </View>
+        </SectionCard>
 
-        {/* CARD 2: Dispute Details */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Dispute Details</Text>
-
+        {/* Dispute Details */}
+        <SectionCard icon={<Info size={18} color={ACCENT} />} title="Dispute Details">
           <View style={styles.detailItem}>
             <Text style={styles.detailLabel}>Subject</Text>
             <Text style={styles.detailValue}>{subject}</Text>
           </View>
-
           <View style={styles.detailItem}>
             <Text style={styles.detailLabel}>Reason</Text>
             <Text style={styles.detailValue}>{reason}</Text>
           </View>
-
-          <View style={styles.detailItem}>
+          <View style={[styles.detailItem, { marginBottom: 0 }]}>
             <Text style={styles.detailLabel}>Settlements</Text>
             <Text style={styles.detailValue}>No settlements proposed yet.</Text>
           </View>
-        </View>
+        </SectionCard>
 
-        {/* CARD 3: Evidence */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Evidence</Text>
+        {/* Evidence */}
+        <SectionCard icon={<Paperclip size={18} color={ACCENT} />} title="Evidence">
           <View style={styles.evidenceRow}>
             {disputeFilesClient?.split(",")?.map((item: string, index: number) => (
               <Image key={index} source={{ uri: item }} style={styles.image} />
             ))}
           </View>
-        </View>
+        </SectionCard>
 
-        {/* CARD 4: Response From The Freelancer */}
-        {(userResponseData?.length === 0 && raised_by === 'freelancer')
-          &&
+        {/* Respond Button */}
+        {(userResponseData?.length === 0 && raised_by === 'freelancer') && (
           <ButtonRN handleClick={() => console.log("button clicked")}>
             Respond
           </ButtonRN>
-        }
+        )}
 
-        {(userResponseData?.length === 0 && raised_by === 'client')
-          &&
-          <Text>Freelancer not responded yet.</Text>
-        }
-
-        {userResponseData?.length > 0 && (
-          <View style={styles.card}>
-            <View style={styles.responseHeader}>
-              <MaterialCommunityIcons name="comment-multiple-outline" size={24} color="#0B3040" />
-              <Text style={styles.responseTitle}>
-                {userResponseData[0]?.message}
-              </Text>
-            </View>
-            <View style={styles.freelancerEvidenceBox}>
-              <Text style={styles.evidenceLabelSmall}>Evidence</Text>
-              {userResponseData[0]?.disputeFilesFreelancer?.split(",")?.map((item: string, index: number) => (
-                <Image key={index} source={{ uri: item }} style={styles.image} />
-              ))}
-            </View>
+        {(userResponseData?.length === 0 && raised_by === 'client') && (
+          <View style={styles.pendingBox}>
+            <AlertTriangle size={18} color="#f59e0b" />
+            <Text style={styles.pendingText}>Freelancer has not responded yet.</Text>
           </View>
-        )
-        }
+        )}
 
+        {/* Response */}
+        {userResponseData?.length > 0 && (
+          <SectionCard icon={<MessageCircle size={18} color={ACCENT} />} title="Freelancer Response">
+            <Text style={styles.responseMessage}>{userResponseData[0]?.message}</Text>
+            {userResponseData[0]?.disputeFilesFreelancer && (
+              <View style={styles.freelancerEvidenceBox}>
+                <Text style={styles.evidenceLabelSmall}>Evidence</Text>
+                {userResponseData[0]?.disputeFilesFreelancer?.split(",")?.map((item: string, index: number) => (
+                  <Image key={index} source={{ uri: item }} style={styles.image} />
+                ))}
+              </View>
+            )}
+          </SectionCard>
+        )}
+
+        <View style={{ height: 40 }} />
       </ScrollView>
-    </SafeAreaView>
+    </LinearGradient>
   );
 };
 
-
 const styles = StyleSheet.create({
-
-  container: { flex: 1, backgroundColor: '#F4F4F4' },
-  header: { paddingHorizontal: 20, paddingTop: 10, paddingBottom: 20 },
-  backButton: { width: 40, height: 40, borderRadius: 10, backgroundColor: '#8CB4B8', justifyContent: 'center', alignItems: 'center', marginBottom: 20 },
-  headerTitleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
-  disputeId: { fontSize: 22, fontWeight: 'bold', color: '#0B3040' },
-  orderCreatedText: { fontSize: 13, color: '#0B3040', marginTop: 4 },
-  statusBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#DCE7EE', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 20 },
-  statusText: { fontSize: 14, color: '#4A6173', marginLeft: 5, fontWeight: '500' },
-  scrollContent: { paddingHorizontal: 16, paddingBottom: 30 },
-  card: { backgroundColor: 'white', borderRadius: 12, padding: 20, marginBottom: 16, elevation: 10, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.4, shadowRadius: 2 },
-  cardTitle: { fontSize: 18, fontWeight: 'bold', color: '#0B3040', marginBottom: 12 },
-  orderDescription: { fontSize: 14, color: '#7E8A96', lineHeight: 20, marginBottom: 20 },
-  dataGrid: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 },
-  dataCol: { flex: 1 },
-  label: { fontSize: 14, fontWeight: 'bold', color: '#0B3040' },
-  value: { fontSize: 14, color: '#7E8A96', marginTop: 4 },
-  greenText: { color: '#2EA44F', fontWeight: '600' },
-  spacer: { height: 15 },
-  footerText: { fontSize: 13, color: '#9AA5B1' },
-  detailItem: { marginBottom: 15 },
-  detailLabel: { fontSize: 15, fontWeight: 'bold', color: '#3B556E' },
-  detailValue: { fontSize: 14, color: '#7E8A96', marginTop: 4 },
-  evidenceRow: { flexDirection: 'column', justifyContent: 'space-between', gap: 25 },
-  image: {
-    width: '100%',
-    height: 180,
+  gradient: { flex: 1 },
+  scrollContent: {
+    padding: 16,
+    paddingBottom: 40,
   },
-  evidenceContainer: { width: '48%' },
-  imagePlaceholder: { aspectRatio: 1, backgroundColor: '#EAEAEA', borderRadius: 12, justifyContent: 'center', alignItems: 'center', marginBottom: 10 },
-  downloadButton: { flexDirection: 'row', backgroundColor: '#2EA44F', paddingVertical: 8, borderRadius: 6, justifyContent: 'center', alignItems: 'center' },
-  downloadText: { color: 'white', fontSize: 13, fontWeight: 'bold', marginLeft: 6 },
-  responseHeader: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 15 },
-  responseTitle: { flex: 1, fontSize: 17, fontWeight: 'bold', color: '#0B3040', marginLeft: 10 },
-  freelancerEvidenceBox: { backgroundColor: '#EDF2F4', borderRadius: 10, padding: 12, gap: 25 },
-  evidenceLabelSmall: { fontSize: 13, fontWeight: 'bold', color: '#0B3040', marginBottom: 10 },
-  smallEvidenceRow: { flexDirection: 'row', justifyContent: 'space-between' },
-  smallEvidenceContainer: { width: '31%' },
-  smallImagePlaceholder: { aspectRatio: 1, backgroundColor: '#E2D9D9', borderRadius: 8, justifyContent: 'center', alignItems: 'center', marginBottom: 6 },
-  smallDownloadText: { color: 'white', fontSize: 9, fontWeight: 'bold', marginLeft: 3 },
 
+  // Hero
+  heroCard: {
+    borderRadius: 18,
+    padding: 20,
+    marginBottom: 14,
+  },
+  statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.22)',
+    alignSelf: 'flex-start',
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 20,
+    gap: 6,
+    marginBottom: 12,
+  },
+  statusDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#fbbf24' },
+  statusText: { color: 'white', fontSize: 12, fontWeight: '600' },
+  heroTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#fff',
+    lineHeight: 28,
+    marginBottom: 6,
+    letterSpacing: -0.3,
+  },
+  heroSub: { fontSize: 12, color: 'rgba(255,255,255,0.75)', fontWeight: '500' },
+
+  // Card
+  card: {
+    backgroundColor: 'rgba(255,255,255,0.82)',
+    borderRadius: 16,
+    marginBottom: 14,
+    borderWidth: 1,
+    borderColor: BORDER,
+    overflow: 'hidden',
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: BORDER,
+    gap: 10,
+  },
+  cardIconBox: {
+    width: 34,
+    height: 34,
+    borderRadius: 10,
+    backgroundColor: 'rgba(13,148,136,0.10)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cardTitle: { fontSize: 15, fontWeight: '700', color: TEXT_PRIMARY },
+  cardBody: { padding: 14 },
+
+  // Stats
+  statsGrid: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  statBox: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 4,
+  },
+  statIconBox: {
+    width: 32,
+    height: 32,
+    borderRadius: 9,
+    backgroundColor: 'rgba(13,148,136,0.10)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 4,
+  },
+  statLabel: { fontSize: 10, color: TEXT_SECONDARY, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.4 },
+  statValue: { fontSize: 14, fontWeight: '700', color: TEXT_PRIMARY },
+  statDivider: { width: 1, height: 40, backgroundColor: BORDER, marginHorizontal: 8 },
+
+  // Detail
+  detailItem: { marginBottom: 14 },
+  detailLabel: { fontSize: 12, fontWeight: '700', color: TEXT_SECONDARY, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 },
+  detailValue: { fontSize: 14, color: TEXT_PRIMARY, lineHeight: 20 },
+
+  // Evidence
+  evidenceRow: { gap: 12 },
+  image: { width: '100%', height: 180, borderRadius: 10 },
+
+  // Pending
+  pendingBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: 'rgba(245,158,11,0.10)',
+    borderRadius: 12,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(245,158,11,0.22)',
+    marginBottom: 14,
+  },
+  pendingText: { fontSize: 14, color: '#92400e', fontWeight: '600' },
+
+  // Response
+  responseMessage: { fontSize: 14, color: TEXT_PRIMARY, lineHeight: 22, marginBottom: 14 },
+  freelancerEvidenceBox: {
+    backgroundColor: 'rgba(14,165,233,0.06)',
+    borderRadius: 12,
+    padding: 12,
+    gap: 10,
+    borderWidth: 1,
+    borderColor: BORDER,
+  },
+  evidenceLabelSmall: { fontSize: 12, fontWeight: '700', color: TEXT_SECONDARY, marginBottom: 6 },
 });
 
 export default ViewDisputedList;

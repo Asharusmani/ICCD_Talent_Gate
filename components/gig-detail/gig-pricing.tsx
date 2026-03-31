@@ -5,185 +5,287 @@ import { setOrder } from '@/store/slices/order-details-slice';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { CheckCircle2, Clock, RotateCcw, XCircle } from 'lucide-react-native';
 
-function GigPricing({ packagesDetails }: any) {
+const ACCENT = '#0d9488';
+const BORDER = 'rgba(14,165,233,0.18)';
+const TEXT_PRIMARY = '#0f172a';
+const TEXT_SECONDARY = '#6b7280';
 
-    const dispatch = useAppDispatch()
+function GigPricing({ packagesDetails }: any) {
+    const dispatch = useAppDispatch();
     const [activeTab, setActiveTab] = useState('Basic');
+
     const selectedPackage = packagesDetails?.find(
-        (pkg) => pkg?.packageType?.toLowerCase() === activeTab.toLowerCase()
+        (pkg: any) => pkg?.packageType?.toLowerCase() === activeTab.toLowerCase()
     );
-    const features = JSON.parse(selectedPackage?.packages)
+
+    const features = selectedPackage?.packages ? JSON.parse(selectedPackage.packages) : {};
 
     useEffect(() => {
-        dispatch(setOrder(selectedPackage))
-    }, [])
+        if (selectedPackage) dispatch(setOrder(selectedPackage));
+    }, [activeTab]);
+
+    if (!selectedPackage) return null;
 
     return (
-        <View style={{ flex: 1 }}>
-            <View style={styles.pricingCard}>
-                <View style={styles.tabBar}>
-                    {["Basic", "Standard", "Premium"].map((item, index) => (
-                        <TouchableOpacity
-                            key={index}
-                            style={[styles.tab, activeTab === item && styles.activeTab]}
-                            onPress={() => {
-                                setActiveTab(item)
-                                const newSelectedPackage = packagesDetails?.find(
-                                    (pkg) => pkg?.packageType?.toLowerCase() === item.toLowerCase()
-                                );
-                                dispatch(setOrder(newSelectedPackage))
-                            }}
-                        >
-                            <Text style={[styles.tabText, activeTab === item && styles.activeTabText]}>{item}</Text>
-                        </TouchableOpacity>
-                    ))}
+        <View style={styles.pricingCard}>
+
+            {/* Tab Bar */}
+            <View style={styles.tabBar}>
+                {['Basic', 'Standard', 'Premium'].map((item) => (
+                    <TouchableOpacity
+                        key={item}
+                        style={[styles.tab, activeTab === item && styles.activeTab]}
+                        onPress={() => {
+                            setActiveTab(item);
+                            const newPkg = packagesDetails?.find(
+                                (pkg: any) => pkg?.packageType?.toLowerCase() === item.toLowerCase()
+                            );
+                            if (newPkg) dispatch(setOrder(newPkg));
+                        }}
+                    >
+                        <Text style={[styles.tabText, activeTab === item && styles.activeTabText]}>
+                            {item}
+                        </Text>
+                    </TouchableOpacity>
+                ))}
+            </View>
+
+            <View style={styles.pricingContent}>
+
+                {/* Price Header */}
+                <View style={styles.priceHeader}>
+                    <View style={styles.priceTitleBlock}>
+                        <Text style={styles.priceTitle} numberOfLines={1}>{activeTab} Package</Text>
+                        <Text style={styles.vendorName} numberOfLines={2}>{selectedPackage?.packageName}</Text>
+                    </View>
+                    <View style={styles.priceBadge}>
+                        <Text style={styles.priceCurrency}>$</Text>
+                        <Text style={styles.priceValue}>{selectedPackage?.price}</Text>
+                    </View>
                 </View>
 
-                <View style={styles.pricingContent}>
-                    <Text style={styles.priceTitle}>{activeTab}</Text>
-                    <Text style={styles.priceValue}>$ {selectedPackage?.price}</Text>
+                {/* Description */}
+                <Text style={styles.vendorSub}>{selectedPackage?.packageDescription}</Text>
 
-                    <Text style={styles.vendorName}>{selectedPackage?.packageName}</Text>
-                    <Text style={styles.vendorSub}>{selectedPackage?.packageDescription}</Text>
-
-                    <View style={styles.statsRow}>
-                        <View style={styles.statItem}>
-                            <Clock size={16} color="#A0A0A0" />
-                            <Text style={styles.statText}>{features?.concepts} Concepts</Text>
+                {/* Stats Row — 3 separate cards */}
+                <View style={styles.statsRow}>
+                    <View style={styles.statItem}>
+                        <View style={styles.statIcon}>
+                            <Clock size={14} color={ACCENT} />
                         </View>
-                        <View style={styles.statItem}>
-                            <Clock size={16} color="#A0A0A0" />
-                            <Text style={styles.statText}>{selectedPackage?.deliveryTime} day delivery</Text>
-                        </View>
-                        <View style={styles.statItem}>
-                            <RotateCcw size={16} color="#A0A0A0" />
-                            <Text style={styles.statText}>{selectedPackage?.revisions} Revisions</Text>
-                        </View>
+                        <Text style={styles.statLabel}>Concepts</Text>
+                        <Text style={styles.statValue}>{features?.concepts ?? '-'}</Text>
                     </View>
 
-                    {/* Features */}
-                    {Object.entries(JSON.parse(selectedPackage.packages)).map(([key, value], index) => (
-                        <View key={index} style={styles.featureItem}>
-                            {value ?
-                                <CheckCircle2 size={20} color="#147D7E" fill="#E8F2F2" />
-                                :
-                                <XCircle size={20} color="#B0B0B0" />
-                            }
-                            <Text style={styles.featureText}>{key.replaceAll("_", " ")}</Text>
+                    <View style={styles.statItem}>
+                        <View style={styles.statIcon}>
+                            <Clock size={14} color={ACCENT} />
                         </View>
-                    ))}
+                        <Text style={styles.statLabel}>Delivery</Text>
+                        <Text style={styles.statValue}>{selectedPackage?.deliveryTime ?? '-'}d</Text>
+                    </View>
+
+                    <View style={styles.statItem}>
+                        <View style={styles.statIcon}>
+                            <RotateCcw size={14} color={ACCENT} />
+                        </View>
+                        <Text style={styles.statLabel}>Revisions</Text>
+                        <Text style={styles.statValue}>{selectedPackage?.revisions ?? '-'}</Text>
+                    </View>
                 </View>
+
+                {/* Divider */}
+                <View style={styles.divider} />
+
+                {/* Features */}
+                <Text style={styles.featuresLabel}>What's included</Text>
+                {Object.entries(features).map(([key, value], index) => (
+                    <View key={index} style={styles.featureItem}>
+                        {value
+                            ? <CheckCircle2 size={18} color={ACCENT} fill="rgba(13,148,136,0.12)" />
+                            : <XCircle size={18} color="#d1d5db" />
+                        }
+                        <Text style={[styles.featureText, !value && styles.featureTextDisabled]} numberOfLines={2}>
+                            {key.replaceAll('_', ' ')}
+                        </Text>
+                    </View>
+                ))}
+
             </View>
         </View>
-    )
+    );
 }
 
 export default GigPricing;
 
 const styles = StyleSheet.create({
     pricingCard: {
-        backgroundColor: '#FFF',
-        borderRadius: 12,
+        backgroundColor: 'rgba(255,255,255,0.92)',
+        borderRadius: 16,
         borderWidth: 1,
-        borderColor: '#EFEFEF',
+        borderColor: BORDER,
         overflow: 'hidden',
         marginBottom: 20,
+        alignSelf: 'stretch',
     },
+
+    // Tab Bar
     tabBar: {
         flexDirection: 'row',
-        backgroundColor: '#F7F7F7',
+        backgroundColor: 'rgba(14,165,233,0.07)',
+        borderBottomWidth: 1,
+        borderBottomColor: BORDER,
     },
     tab: {
         flex: 1,
-        paddingVertical: 15,
+        paddingVertical: 14,
         alignItems: 'center',
-        borderBottomWidth: 3,
+        borderBottomWidth: 2.5,
         borderBottomColor: 'transparent',
     },
     activeTab: {
-        backgroundColor: '#FFF',
-        borderBottomColor: '#00334E',
+        backgroundColor: 'rgba(255,255,255,0.90)',
+        borderBottomColor: ACCENT,
     },
     tabText: {
-        fontSize: 14,
+        fontSize: 13,
         fontWeight: '600',
-        color: '#00334E',
+        color: TEXT_SECONDARY,
     },
     activeTabText: {
-        color: '#00334E',
+        color: ACCENT,
+        fontWeight: '700',
     },
+
+    // Content
     pricingContent: {
-        padding: 20,
+        padding: 16,
+    },
+
+    // Price Header
+    priceHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        marginBottom: 10,
+        gap: 10,
+    },
+    priceTitleBlock: {
+        flex: 1,
+        minWidth: 0,
     },
     priceTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
+        fontSize: 16,
+        fontWeight: '700',
+        color: TEXT_PRIMARY,
+        marginBottom: 3,
+    },
+    vendorName: {
+        fontSize: 13,
+        fontWeight: '600',
+        color: TEXT_SECONDARY,
+    },
+    priceBadge: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        backgroundColor: 'rgba(13,148,136,0.10)',
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: 'rgba(13,148,136,0.20)',
+        flexShrink: 0,
+    },
+    priceCurrency: {
+        fontSize: 13,
+        fontWeight: '700',
+        color: ACCENT,
+        marginTop: 3,
     },
     priceValue: {
         fontSize: 22,
-        fontWeight: 'bold',
-        color: '#043A53',
-        marginVertical: 5,
-    },
-    vendorName: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        marginTop: 10,
+        fontWeight: '800',
+        color: ACCENT,
+        lineHeight: 28,
     },
     vendorSub: {
-        color: '#78A5A6',
-        marginBottom: 15,
+        fontSize: 13,
+        color: TEXT_SECONDARY,
+        lineHeight: 20,
+        marginBottom: 14,
     },
+
+    // Stats — 3 separate card boxes
     statsRow: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 20,
+        gap: 8,
+        marginBottom: 16,
     },
     statItem: {
-        flexDirection: 'row',
+        flex: 1,
+        backgroundColor: 'rgba(14,165,233,0.06)',
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: BORDER,
+        padding: 10,
         alignItems: 'center',
+        gap: 4,
+        minWidth: 0,
     },
-    statText: {
-        fontSize: 12,
-        color: '#A0A0A0',
-        marginLeft: 5,
+    statIcon: {
+        width: 30,
+        height: 30,
+        borderRadius: 8,
+        backgroundColor: 'rgba(13,148,136,0.10)',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 2,
+    },
+    statLabel: {
+        fontSize: 10,
+        fontWeight: '600',
+        color: TEXT_SECONDARY,
+        textTransform: 'uppercase',
+        letterSpacing: 0.5,
+        textAlign: 'center',
+    },
+    statValue: {
+        fontSize: 15,
+        fontWeight: '800',
+        color: TEXT_PRIMARY,
+        textAlign: 'center',
+    },
+
+    // Features
+    divider: {
+        height: 1,
+        backgroundColor: BORDER,
+        marginBottom: 14,
+    },
+    featuresLabel: {
+        fontSize: 11,
+        fontWeight: '700',
+        color: TEXT_SECONDARY,
+        textTransform: 'uppercase',
+        letterSpacing: 0.8,
+        marginBottom: 12,
     },
     featureItem: {
         flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 12,
+        alignItems: 'flex-start',
+        gap: 10,
+        marginBottom: 11,
+        minWidth: 0,
     },
     featureText: {
         fontSize: 14,
-        color: '#00334E',
+        color: TEXT_PRIMARY,
         fontWeight: '500',
-        marginLeft: 10,
+        textTransform: 'capitalize',
+        flex: 1,
+        flexWrap: 'wrap',
     },
-    continueBtn: {
-        backgroundColor: '#147D7E',
-        height: 55,
-        borderRadius: 10,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: 12,
-    },
-    continueBtnText: {
-        color: '#FFF',
-        fontSize: 18,
-        fontWeight: 'bold',
-    },
-    contactBtn: {
-        backgroundColor: '#FFF',
-        height: 55,
-        borderRadius: 10,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderWidth: 1,
-        borderColor: '#147D7E',
-    },
-    contactBtnText: {
-        color: '#147D7E',
-        fontSize: 18,
-        fontWeight: 'bold',
+    featureTextDisabled: {
+        color: '#d1d5db',
     },
 });

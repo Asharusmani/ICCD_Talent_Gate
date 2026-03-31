@@ -3,127 +3,152 @@ import GigCard2 from "@/components/cards/gig-card-2";
 import ICCDLoader from "@/components/ui/loader2";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
+import { useHeaderHeight } from "@react-navigation/elements";
+import { Search, Plus } from "lucide-react-native";
 import { useState } from "react";
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
-    FlatList,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
+  FlatList,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+
+const PRIMARY        = '#7dd3fc';
+const MID            = '#bae6fd';
+const DARK           = '#e0f2fe';
+const DARKEST        = '#f0f9ff';
+const ACCENT         = '#0d9488';
+const BORDER         = 'rgba(14,165,233,0.20)';
+const TEXT_PRIMARY   = '#0f172a';
+const TEXT_SECONDARY = 'rgba(15,23,42,0.50)';
 
 const List = () => {
-
-  const router = useRouter();
+  const router      = useRouter();
+  const headerHeight = useHeaderHeight();
+  const insets      = useSafeAreaInsets(); // ✅ top pe — early return se pehle
   const [search, setSearch] = useState("");
 
-  const { data, totalPages, isLoading, isError, error } = useGetGigsByUser();
-  if (isLoading) return <ICCDLoader />
-  if (isError) return <Text>{error.message}</Text>
+  const { data, isLoading, isError, error } = useGetGigsByUser();
+
+  if (isLoading) return <ICCDLoader />;
+  if (isError)   return <Text>{error.message}</Text>;
 
   return (
-    <SafeAreaView style={styles.safeContainer}>
-      <TextInput
-        placeholder="Search Gigs..."
-        placeholderTextColor="#777"
-        value={search}
-        onChangeText={setSearch}
-        style={styles.searchBar}
-      />
-
-      {/* Gradient Button */}
-      <View style={styles.buttonRow}>
-        <View style={{ flex: 1 }} />
-        <TouchableOpacity
-          onPress={() => router.push("/posted-gigs/add-gig/gig-overview")}
-        >
-          <LinearGradient
-            colors={["#15A9B2", "#17747A"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.addButton}
-          >
-            <Text style={styles.addButtonText}>Add New Gig</Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      </View>
-
+    <LinearGradient
+      colors={[DARKEST, DARK, MID, PRIMARY]}
+      style={styles.gradient}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0.6, y: 1 }}
+    >
       <FlatList
         data={data}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => <GigCard2 item={item} />}
-        contentContainerStyle={{ paddingBottom: 40 }}
+        contentContainerStyle={[
+          styles.listContent,
+          { paddingTop: insets.top + 80 },
+        ]}
         showsVerticalScrollIndicator={false}
+        ListHeaderComponent={
+          <>
+            {/* Header Row */}
+            <View style={styles.headerRow}>
+              <View>
+                <Text style={styles.greeting}>Manage</Text>
+                <Text style={styles.heading}>My Gigs</Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => router.push("/posted-gigs/add-gig/gig-description")}
+                style={styles.addButton}
+              >
+                <Plus size={16} color="#fff" />
+                <Text style={styles.addButtonText}>Add New Gig</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Search Bar */}
+            <View style={styles.searchRow}>
+              <View style={styles.searchBox}>
+                <Search size={15} color="rgba(15,23,42,0.40)" />
+                <TextInput
+                  placeholder="Search gigs..."
+                  placeholderTextColor="rgba(15,23,42,0.30)"
+                  value={search}
+                  onChangeText={setSearch}
+                  style={styles.searchInput}
+                />
+              </View>
+            </View>
+          </>
+        }
       />
-    </SafeAreaView>
+    </LinearGradient>
   );
 };
 
 export default List;
 
 const styles = StyleSheet.create({
-  safeContainer: { flex: 1, backgroundColor: '#F4F4F4', padding: 15 },
-
-  headerCard: {
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 15
+  gradient: {
+    flex: 1,
   },
-  headerTitle: { fontSize: 18, fontWeight: "bold", color: "#fff" },
-  headerSubtitle: { fontSize: 13, color: "#fff", marginTop: 5 },
-
-  searchBar: {
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: "#BDBDBD",
-    marginBottom: 10
+  listContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 120,
   },
-
-  buttonRow: {
+  headerRow: {
     flexDirection: "row",
-    justifyContent: "flex-end",
-    marginBottom: 15
-  },
-
-  addButton: {
-    width: 123,
-    paddingVertical: 12,
-    borderRadius: 8,
+    justifyContent: "space-between",
     alignItems: "center",
-    elevation: 2
+    marginBottom: 22,
   },
-
+  greeting: {
+    fontSize: 13,
+    color: TEXT_SECONDARY,
+    fontWeight: "600",
+    letterSpacing: 0.4,
+    marginBottom: 3,
+  },
+  heading: {
+    fontSize: 26,
+    fontWeight: "800",
+    color: TEXT_PRIMARY,
+    letterSpacing: -0.5,
+  },
+  addButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+    backgroundColor: ACCENT,
+  },
   addButtonText: {
     color: "#fff",
-    fontWeight: "bold",
-    fontSize: 14
+    fontWeight: "700",
+    fontSize: 13,
   },
-
-  card: {
+  searchRow: {
+    marginBottom: 22,
+  },
+  searchBox: {
     flexDirection: "row",
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 10,
-    marginBottom: 15,
-    elevation: 2,
-    position: "relative",
-    alignItems: "center"
+    alignItems: "center",
+    backgroundColor: "rgba(255,255,255,0.80)",
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    height: 48,
+    borderWidth: 1.5,
+    borderColor: BORDER,
+    gap: 8,
   },
-
-  cardImage: { width: 120, height: 80, borderRadius: 10 },
-  cardContent: { flex: 1, marginLeft: 10, justifyContent: "center" },
-
-  menuBtn: {
-    position: "absolute",
-    right: 10,
-    top: 10
+  searchInput: {
+    flex: 1,
+    fontSize: 13,
+    color: TEXT_PRIMARY,
   },
-
-  cardDesc: { fontSize: 14, color: "#075458", fontWeight: "600" },
-  categoryText: { fontSize: 12, color: "#075458", fontWeight: "500", marginTop: 4 },
-  typeText: { fontSize: 12, color: "#075458", fontWeight: "400", marginTop: 2 }
 });

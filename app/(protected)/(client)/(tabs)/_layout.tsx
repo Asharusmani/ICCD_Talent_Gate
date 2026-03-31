@@ -2,35 +2,33 @@ import { HapticTab } from '@/components/haptic-tab';
 import ProfileHeader from '@/components/header/profile-header';
 import Header from '@/components/header/tabs-header';
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
-import { Tabs, useNavigation } from 'expo-router';
-import { House } from 'lucide-react-native';
+import { Tabs } from 'expo-router';
+import { House, ShoppingBag } from 'lucide-react-native';
 
 export default function ClientTabsLayout() {
-  const navigation = useNavigation();
-
   return (
     <Tabs
       screenOptions={{
-        // Tab bar styling
-        tabBarActiveTintColor: '#40ADB6',
-        tabBarInactiveTintColor: '#000000',
+        tabBarActiveTintColor: '#0d9488',
+        tabBarInactiveTintColor: '#94a3b8',
         tabBarStyle: {
-          borderTopColor: '#E5E5EA',
+          borderTopColor: 'rgba(14,165,233,0.18)',
           borderTopWidth: 1,
-          // height: Platform.OS === 'ios' ? 55 : 60,
-          // position: "absolute",
-          // paddingVertical: 40,
-          // bottom: 10,
-          // marginHorizontal: 15,
-          // borderRadius: 20,
-          // ...SHADOWS.large
+          backgroundColor: 'rgba(255,255,255,0.97)',
+          height: 62,
+          paddingBottom: 10,
+          paddingTop: 6,
         },
-        header: ({options}) => <Header title={options.title || 'N/A'}/>,
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: '600',
+        },
+        headerTransparent: true,
+        header: ({ options }) => <Header title={options.title || ''} />,
         headerShown: true,
         tabBarButton: HapticTab,
       }}
     >
-      {/* DASHBOARD TAB */}
       <Tabs.Screen
         name="index"
         options={{
@@ -42,27 +40,25 @@ export default function ClientTabsLayout() {
         }}
       />
 
-      {/* ORDERS TAB */}
       <Tabs.Screen
         name="order"
         options={{
           headerShown: true,
           title: 'Orders',
           tabBarIcon: ({ color, size }) => (
-            <FontAwesome name="shopping-cart" size={size} color={color} />
+            <ShoppingBag size={size} color={color} />
           ),
           headerTitle: 'My Orders',
         }}
       />
 
-      {/* PROFILE TAB */}
       <Tabs.Screen
         name="profile"
         options={{
-          headerShown: true,
+          headerShown: false,
           title: 'Profile',
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person" size={size} color={color} />
+            <Ionicons name="person-outline" size={size} color={color} />
           ),
           headerTitle: 'Profile',
           header: () => <ProfileHeader title="Profile" />
@@ -74,7 +70,7 @@ export default function ClientTabsLayout() {
         options={{
           title: 'Menu',
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="menu" size={size} color={color} /> // Changed to menu icon for clarity
+            <Ionicons name="menu-outline" size={size} color={color} />
           ),
         }}
         listeners={({ navigation }) => ({
@@ -84,7 +80,6 @@ export default function ClientTabsLayout() {
           },
         })}
       />
-
     </Tabs>
   );
 }

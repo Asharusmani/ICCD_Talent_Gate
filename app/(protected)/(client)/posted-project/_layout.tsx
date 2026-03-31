@@ -8,11 +8,23 @@ export default function PostedProjectLayout() {
     <Stack
       screenOptions={{
         headerShown: true,
-        header: () => <TabsHeader title='Posted Project'/>
+        headerTransparent: true,        // ← yeh add karo
+        header: () => <TabsHeader title='Posted Project' />
       }}
     >
-      <Stack.Screen name="index" options={{ title: "Posted Project" }} />
-      <Stack.Screen name="[id]" options={{ title: "Project Detail", headerShown: true, header: () => <ChatHeader title='Project Detail' /> }} />
+      <Stack.Screen
+        name="index"
+        options={{ title: "Posted Project" }}
+      />
+      <Stack.Screen
+        name="[id]"
+        options={{
+          title: "Project Detail",
+          headerShown: true,
+          headerTransparent: true,      // ← yeh bhi
+          header: () => <ChatHeader title='Project Detail' />
+        }}
+      />
     </Stack>
   );
 }

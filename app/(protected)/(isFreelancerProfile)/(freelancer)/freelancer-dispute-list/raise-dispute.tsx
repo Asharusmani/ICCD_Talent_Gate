@@ -13,8 +13,11 @@ import {
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm, Controller } from 'react-hook-form';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import { MessageSquare, ChevronLeft, Upload, Info, CheckCircle2 } from 'lucide-react-native';
+
+const ACCENT = '#0d9488';
 
 // Validation Schema
 const schema = yup.object().shape({
@@ -39,6 +42,8 @@ const RespondToDisputePage: React.FC<RespondToDisputePageProps> = ({
   onBack,
   onSubmit,
 }) => {
+  const insets = useSafeAreaInsets();
+
   const {
     control,
     handleSubmit,
@@ -58,19 +63,24 @@ const RespondToDisputePage: React.FC<RespondToDisputePageProps> = ({
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <LinearGradient
+      colors={['#f0f9ff', '#e0f2fe', '#bae6fd', '#7dd3fc']}
+      style={styles.safeArea}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0.6, y: 1 }}
+    >
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}
       >
         <ScrollView 
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 16 }]}
         >
           {/* Hero Section */}
           <View style={styles.heroSection}>
             <View style={styles.iconBadge}>
-              <MessageSquare size={28} color="#059669" strokeWidth={2} />
+              <MessageSquare size={28} color={ACCENT} strokeWidth={2} />
             </View>
             <Text style={styles.pageTitle}>Respond to Dispute</Text>
             <Text style={styles.pageSubtitle}>
@@ -166,18 +176,18 @@ const RespondToDisputePage: React.FC<RespondToDisputePageProps> = ({
           <View style={styles.guidelines}>
             <Text style={styles.guidelinesTitle}>Quick Tips:</Text>
             <View style={styles.guidelineItem}>
-              <CheckCircle2 size={14} color="#10B981" />
+              <CheckCircle2 size={14} color={ACCENT} />
               <Text style={styles.guidelineText}>Keep it professional and factual.</Text>
             </View>
             <View style={styles.guidelineItem}>
-              <CheckCircle2 size={14} color="#10B981" />
+              <CheckCircle2 size={14} color={ACCENT} />
               <Text style={styles.guidelineText}>Attach screenshots if applicable.</Text>
             </View>
           </View>
         </ScrollView>
 
         {/* Fixed Footer Action */}
-        <View style={styles.footer}>
+        <View style={[styles.footer, { paddingBottom: insets.bottom || 20 }]}>
           <TouchableOpacity
             style={[styles.submitButton, isSubmitting && styles.submitButtonDisabled]}
             onPress={handleSubmit(handleFormSubmit)}
@@ -190,14 +200,13 @@ const RespondToDisputePage: React.FC<RespondToDisputePageProps> = ({
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F4F4F4'
   },
   header: {
     flexDirection: 'row',
@@ -232,13 +241,15 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   iconBadge: {
-    backgroundColor: '#DCFCE7',
+    backgroundColor: 'rgba(255,255,255,0.80)',
     width: 64,
     height: 64,
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(14,165,233,0.20)',
   },
   pageTitle: {
     fontSize: 24,
@@ -257,12 +268,12 @@ const styles = StyleSheet.create({
   },
   infoBox: {
     flexDirection: 'row',
-    backgroundColor: '#F0F9FF',
+    backgroundColor: 'rgba(255,255,255,0.70)',
     padding: 16,
     borderRadius: 16,
     marginBottom: 32,
     borderWidth: 1,
-    borderColor: '#BAE6FD',
+    borderColor: 'rgba(14,165,233,0.20)',
   },
   infoIcon: {
     marginRight: 12,
@@ -296,15 +307,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   inputWrapper: {
-    backgroundColor: '#F8FAFC',
+    backgroundColor: 'rgba(255,255,255,0.80)',
     borderWidth: 1.5,
-    borderColor: '#E2E8F0',
+    borderColor: 'rgba(14,165,233,0.20)',
     borderRadius: 14,
   },
   textAreaWrapper: {
-    backgroundColor: '#F8FAFC',
+    backgroundColor: 'rgba(255,255,255,0.80)',
     borderWidth: 1.5,
-    borderColor: '#E2E8F0',
+    borderColor: 'rgba(14,165,233,0.20)',
     borderRadius: 14,
     minHeight: 160,
   },
@@ -340,11 +351,11 @@ const styles = StyleSheet.create({
   },
   uploadArea: {
     borderWidth: 2,
-    borderColor: '#E2E8F0',
+    borderColor: 'rgba(14,165,233,0.20)',
     borderStyle: 'dashed',
     borderRadius: 16,
     padding: 20,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: 'rgba(255,255,255,0.70)',
   },
   uploadContent: {
     flexDirection: 'row',
@@ -377,8 +388,10 @@ const styles = StyleSheet.create({
   guidelines: {
     marginTop: 32,
     padding: 20,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: 'rgba(255,255,255,0.70)',
     borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(14,165,233,0.20)',
   },
   guidelinesTitle: {
     fontSize: 14,
@@ -402,20 +415,19 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     padding: 20,
-    paddingBottom: Platform.OS === 'ios' ? 34 : 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'rgba(255,255,255,0.85)',
     borderTopWidth: 1,
-    borderTopColor: '#F1F5F9',
+    borderTopColor: 'rgba(14,165,233,0.18)',
   },
   submitButton: {
-    backgroundColor: '#0F172A',
+    backgroundColor: ACCENT,
     paddingVertical: 16,
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#0F172A',
+    shadowColor: ACCENT,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 4,
   },

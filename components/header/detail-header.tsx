@@ -1,63 +1,79 @@
 import { router } from "expo-router";
-import { Bell, Mail, Menu, MessageCircle, ChevronLeft } from "lucide-react-native";
-import { StyleSheet, TouchableOpacity, View, Image } from "react-native";
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
-import { SHADOWS } from '@/components/styles/global-style'
-import { Text } from "react-native";
+import { ChevronLeft } from "lucide-react-native";
+import { StyleSheet, TouchableOpacity, View, Text } from "react-native";
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
+
+const ACCENT = '#0d9488';
+const TEXT_PRIMARY = '#0f172a';
 
 export default function ChatHeader({ title = '' }) {
-  const navigation = useNavigation<any>()
-  const handleOpenDrawer = () => {
-    navigation.openDrawer();
-  };
+  const insets = useSafeAreaInsets();
+
   return (
-    <SafeAreaView style={{ backgroundColor: '#F4F4F4' }}>
-      <View style={styles.container}>
-        {/* Menu button to toggle drawer */}
-        <TouchableOpacity style={[styles.icon, SHADOWS.medium]} onPress={() => router.back()}>
-          <ChevronLeft size={24} color="#000" />
+    <LinearGradient
+      colors={['#f0f9ff', '#e0f2fe']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0.6, y: 1 }}
+    >
+      <View style={[styles.container, { paddingTop: insets.top + 8 }]}>
+
+        {/* Back Button */}
+        <TouchableOpacity
+          style={styles.backBtn}
+          onPress={() => router.back()}
+          activeOpacity={0.8}
+        >
+          <ChevronLeft size={22} color={ACCENT} />
         </TouchableOpacity>
 
-        {/* Centered title */}
-        {title && (
-          <View style={styles.titleContainer}>
-            <Text style={styles.title}>{title}</Text>
+        {/* Title — centered absolutely so it never overlaps button */}
+        {title ? (
+          <View style={styles.titleWrapper}>
+            <Text style={styles.title} numberOfLines={1}>{title}</Text>
           </View>
-        )}
+        ) : null}
+
+        {/* Right spacer — same width as back button to keep title centered */}
+        <View style={styles.spacer} />
 
       </View>
-    </SafeAreaView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 15,
-    paddingTop: 6,
-    marginTop: 5
-  },
-  titleContainer: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
+    flexDirection: 'row',
     alignItems: 'center',
-    zIndex: -1,  // Place behind buttons so they remain clickable
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingBottom: 14,
+  },
+  backBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.75)',
+    borderWidth: 1,
+    borderColor: 'rgba(14,165,233,0.25)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  titleWrapper: {
+    flex: 1,
+    alignItems: 'center',
+    paddingHorizontal: 8,
   },
   title: {
-    fontSize: 20,
-    fontWeight: '600',
+    fontSize: 18,
+    fontWeight: '700',
+    color: TEXT_PRIMARY,
+    letterSpacing: -0.3,
   },
-  rightIcons: {
-    flexDirection: "row",
-    gap: 10
-  },
-  icon: {
-    backgroundColor: "#FFFFFF",
-    padding: 9,
-    borderRadius: 24
+  spacer: {
+    width: 40,   // same as backBtn width — keeps title perfectly centered
+    flexShrink: 0,
   },
 });

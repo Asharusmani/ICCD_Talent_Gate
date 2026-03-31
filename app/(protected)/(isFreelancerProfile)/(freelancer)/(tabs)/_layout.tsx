@@ -2,6 +2,9 @@ import ProfileHeader from '@/components/header/profile-header';
 import TabsHeader from '@/components/header/tabs-header';
 import { FontAwesome, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { Tabs, useNavigation } from 'expo-router';
+import { BlurView } from 'expo-blur';
+import { StyleSheet } from 'react-native';
+import OrderHeader from '@/components/header/OrderHeader';
 
 export default function FreelancerTabsLayout() {
   const navigation = useNavigation();
@@ -9,20 +12,27 @@ export default function FreelancerTabsLayout() {
   return (
     <Tabs
       screenOptions={{
-        // Tab bar styling
-        tabBarActiveTintColor: '#007AFF',
-        tabBarInactiveTintColor: '#8E8E93',
+        tabBarActiveTintColor: '#0d9488',
+        tabBarInactiveTintColor: '#94a3b8',
         tabBarStyle: {
-          backgroundColor: '#FFFFFF',
-          borderTopColor: '#E5E5EA',
+          backgroundColor: 'transparent',
+          borderTopColor: 'rgba(14,165,233,0.18)',
           borderTopWidth: 1,
-          // height: Platform.OS === 'ios' ? 85 : 60,
-          // paddingBottom: Platform.OS === 'ios' ? 20 : 10,
-          // paddingTop: 10,
+          position: 'absolute',
+          elevation: 0,
         },
-        // Header with drawer toggle
+        tabBarBackground: () => (
+          <BlurView
+            intensity={40}
+            tint="light"
+            style={StyleSheet.absoluteFill}
+          />
+        ),
         headerShown: true,
-        header: () => <TabsHeader />,
+        headerTransparent: true,        // ← yeh add karo
+        header: ({ route }) => (
+          <TabsHeader title={"Dashboard"} />
+        ),
       }}
     >
       {/* DASHBOARD TAB */}
@@ -33,7 +43,6 @@ export default function FreelancerTabsLayout() {
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons name="dashboard" size={size} color={color} />
           ),
-          headerTitle: 'Dashboard',
         }}
       />
 
@@ -45,7 +54,7 @@ export default function FreelancerTabsLayout() {
           tabBarIcon: ({ color, size }) => (
             <FontAwesome name="shopping-cart" size={size} color={color} />
           ),
-          headerTitle: 'My Orders',
+          header: () => <OrderHeader title="Order" />
         }}
       />
 
@@ -58,7 +67,6 @@ export default function FreelancerTabsLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person" size={size} color={color} />
           ),
-          headerTitle: 'My Profile',
           header: () => <ProfileHeader title="Profile" />
         }}
       />
