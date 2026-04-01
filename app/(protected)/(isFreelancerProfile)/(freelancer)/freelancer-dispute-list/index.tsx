@@ -29,7 +29,7 @@ export default function Dispute() {
         data={data}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => <DisputeCard item={item} />}
-        contentContainerStyle={[styles.listPadding, { paddingTop:  50 }]}
+        contentContainerStyle={[styles.listPadding, { paddingTop:  10 }]}
         showsVerticalScrollIndicator={false}
       />
     </LinearGradient>
@@ -43,6 +43,7 @@ const styles = StyleSheet.create({
   },
   listPadding: {
     // padding: 15,
-    marginTop: 20
+    marginTop: 20,
+    paddingBottom: 40,
   },
 });

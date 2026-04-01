@@ -77,7 +77,8 @@ export default function FreelancerLayout() {
           <Drawer.Screen
             name="freelancer-order-detail/[id]"
             options={{
-              headerShown: true,
+              headerShown: false,
+              headerTransparent : true,
               title: 'Order Details',
               headerLeft: () => (
                 <TouchableOpacity

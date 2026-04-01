@@ -27,7 +27,7 @@ export default function Job() {
             start={{ x: 0, y: 0 }}
             end={{ x: 0.6, y: 1 }}
         >
-            <View style={[styles.container, { paddingTop: insets.top + 16 }]}>
+            <View style={[styles.container, { paddingTop: insets.top + 80 }]}>
 
                 {/* Header */}
                 <View style={styles.headerRow}>

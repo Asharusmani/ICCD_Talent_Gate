@@ -9,7 +9,7 @@ export default function OrderDetailHeader({ orderNo, status }: any) {
     <View style={styles.header}>
       <TouchableOpacity onPress={() => router.back()}>
         <View style={styles.topHeader}>
-        <Ionicons name="chevron-back" size={22} color="black" />
+          <Ionicons name="chevron-back" size={22} color="#0d9488" />
         </View>
       </TouchableOpacity>
 
@@ -32,12 +32,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 25,
-    marginTop:20
+    marginTop: 20,
   },
   title: {
     fontSize: 18,
     fontWeight: '600',
-    paddingRight: 80
+    paddingRight: 80,
+    color: '#0f172a',
   },
   sub: {
     fontSize: 12,
@@ -45,7 +46,7 @@ const styles = StyleSheet.create({
   },
   badge: {
     flexDirection: 'row',
-    backgroundColor: '#0ECEDA',
+    backgroundColor: '#0d9488',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 8,
@@ -57,11 +58,14 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   topHeader: {
-    height: 28,
-    width: 28,
-    padding:3,
-    borderRadius:7,
-    backgroundColor:'#17747A59'
-
-  }
+    height: 38,
+    width: 38,
+    padding: 6,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.75)',
+    borderWidth: 1,
+    borderColor: 'rgba(14,165,233,0.20)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });

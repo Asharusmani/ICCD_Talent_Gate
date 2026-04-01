@@ -19,20 +19,22 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 15,
     fontWeight: '600',
-    marginBottom: 8,
     color: '#0f172a',
     marginBottom: 28,
   },
   chip: {
     alignSelf: 'flex-start',
-    backgroundColor: '#f1f5f9',
+    backgroundColor: 'rgba(13,148,136,0.10)',
     paddingHorizontal: 20,
     paddingVertical: 8,
     borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(13,148,136,0.20)',
   },
   chipText: {
     fontSize: 13,
-    color: '#334155',
+    color: '#0d9488',
+    fontWeight: '600',
     marginLeft: -3,
   },
 });

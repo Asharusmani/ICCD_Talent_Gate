@@ -1,13 +1,18 @@
 import ProfileHeader from '@/components/header/profile-header';
-import TabsHeader from '@/components/header/tabs-header';
+import TabsFreelancerHeader from '@/components/header/tabs-header-freelancer';
+import OrderHeader from '@/components/header/OrderHeader';
+import { HapticTab } from '@/components/haptic-tab';
 import { FontAwesome, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { Tabs, useNavigation } from 'expo-router';
-import { BlurView } from 'expo-blur';
-import { StyleSheet } from 'react-native';
-import OrderHeader from '@/components/header/OrderHeader';
+import { Platform } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function FreelancerTabsLayout() {
   const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
+
+  const tabBarHeight = Platform.OS === 'ios' ? 45 + insets.bottom : 100;
+  const tabBarPaddingBottom = Platform.OS === 'ios' ? insets.bottom + 4 : 10;
 
   return (
     <Tabs
@@ -15,24 +20,23 @@ export default function FreelancerTabsLayout() {
         tabBarActiveTintColor: '#0d9488',
         tabBarInactiveTintColor: '#94a3b8',
         tabBarStyle: {
-          backgroundColor: 'transparent',
           borderTopColor: 'rgba(14,165,233,0.18)',
           borderTopWidth: 1,
-          position: 'absolute',
-          elevation: 0,
+          backgroundColor: '#ffffff',
+          height: tabBarHeight,
+          paddingBottom: tabBarPaddingBottom,
+          paddingTop: 6,
         },
-        tabBarBackground: () => (
-          <BlurView
-            intensity={40}
-            tint="light"
-            style={StyleSheet.absoluteFill}
-          />
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: '600',
+        },
+        headerTransparent: true,
+        header: ({ options }) => (
+          <TabsFreelancerHeader title={options.title ?? ''} />
         ),
         headerShown: true,
-        headerTransparent: true,        // ← yeh add karo
-        header: ({ route }) => (
-          <TabsHeader title={"Dashboard"} />
-        ),
+        tabBarButton: HapticTab,
       }}
     >
       {/* DASHBOARD TAB */}

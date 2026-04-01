@@ -4,8 +4,15 @@ import Header from '@/components/header/tabs-header';
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import { House, ShoppingBag } from 'lucide-react-native';
+import { Platform } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function ClientTabsLayout() {
+  const insets = useSafeAreaInsets();
+
+  const tabBarHeight = Platform.OS === 'ios' ? 45 + insets.bottom : 100;
+  const tabBarPaddingBottom = Platform.OS === 'ios' ? insets.bottom + 4 : 10;
+
   return (
     <Tabs
       screenOptions={{
@@ -14,9 +21,9 @@ export default function ClientTabsLayout() {
         tabBarStyle: {
           borderTopColor: 'rgba(14,165,233,0.18)',
           borderTopWidth: 1,
-          backgroundColor: 'rgba(255,255,255,0.97)',
-          height: 62,
-          paddingBottom: 10,
+          backgroundColor: '#ffffff',
+          height: tabBarHeight,
+          paddingBottom: tabBarPaddingBottom,
           paddingTop: 6,
         },
         tabBarLabelStyle: {

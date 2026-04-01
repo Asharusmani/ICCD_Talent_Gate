@@ -7,6 +7,7 @@ import {
   View, 
   KeyboardTypeOptions 
 } from 'react-native';
+import { HeaderHeightContext } from '@react-navigation/elements';
 
 interface SearchBarProps {
   label?: string;
@@ -62,7 +63,8 @@ export default function SearchBar({
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    marginBottom: 4,
+    
+   
   },
   label: {
     fontSize: 14,

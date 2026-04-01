@@ -96,7 +96,7 @@ export default function ApplyJob() {
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             >
                 <ScrollView
-                    contentContainerStyle={[styles.scrollContent, { paddingTop:  16 }]}
+                    contentContainerStyle={[styles.scrollContent, { paddingTop:  80 + insets.top }]}
                     showsVerticalScrollIndicator={false}
                 >
                     {/* Hero */}

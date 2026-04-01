@@ -6,17 +6,19 @@ import OrderSummaryCards from '@/components/order-detail/order-summary-cards';
 import PackageDetails from '@/components/order-detail/package-details';
 import ProductSlider from '@/components/order-detail/product-slider';
 import { useLocalSearchParams } from 'expo-router';
-import { ScrollView, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import ICCDLoader from '@/components/ui/loader2';
 
 export default function OrderDetailsScreen() {
 
     const { id } = useLocalSearchParams()
+    const insets = useSafeAreaInsets();
     const { data: orderData, isLoading, isError, error } = useSingleOrderByClient(id);
 
     if (isLoading) return <ICCDLoader />
-    if (isError) return error.message
+    if (isError) return <Text>{error?.message}</Text>
 
     const { id: orderId, status, category, description, gigsImage } = orderData?.order
     const { name: packName, packDescription, packType, deliveryTime, revisions, price, packages } = orderData?.packages[0]
@@ -27,8 +29,16 @@ export default function OrderDetailsScreen() {
         .map(([key]) => key);
 
     return (
-        <SafeAreaView style={styles.container}>
-            <ScrollView showsVerticalScrollIndicator={false}>
+        <LinearGradient
+            colors={['#f0f9ff', '#e0f2fe', '#bae6fd', '#7dd3fc']}
+            style={styles.container}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 0.6, y: 1 }}
+        >
+            <ScrollView
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ paddingTop: insets.top + 14, paddingHorizontal: 16, paddingBottom: 40 }}
+            >
                 <View>
                     <OrderDetailHeader
                         orderNo={orderId}
@@ -56,22 +66,26 @@ export default function OrderDetailsScreen() {
                 <OrderDescription description={description} />
 
             </ScrollView>
-        </SafeAreaView>
+        </LinearGradient>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 16,
-        backgroundColor: '#F4F4F4'
     },
     box: {
-        backgroundColor: '#FFFFFF',
-        borderRadius: 12,
+        backgroundColor: 'rgba(255,255,255,0.85)',
+        borderRadius: 16,
         padding: 0,
         marginBottom: 20,
-        elevation: 0.3,
+        borderWidth: 1,
+        borderColor: 'rgba(14,165,233,0.12)',
+        elevation: 2,
+        shadowColor: '#0d9488',
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.08,
+        shadowRadius: 8,
     },
     // boxSlider: {
     //   padding: 10,

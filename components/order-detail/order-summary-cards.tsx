@@ -14,32 +14,32 @@ export default function OrderSummaryCards({
         icon="cube-outline"
         title="Package"
         value={packageName}
-        backgroundColor="#eaf3ff"
-        color="#0f172a"
+        backgroundColor="rgba(255,255,255,0.80)"
+        color="#0d9488"
       />
 
       <InfoCard
-        icon="logo-usd"
+        icon="cash-outline"
         title="Total Price"
         value={`$${price}`}
-        backgroundColor="#eafff1"
-        color="#22c55e"
+        backgroundColor="rgba(255,255,255,0.80)"
+        color="#0891b2"
       />
 
       <InfoCard
-        icon="star-outline"
+        icon="refresh-outline"
         title="Revisions"
         value={revisions}
-        backgroundColor="#f5f1ff"
-        color="#8b5cf6"
+        backgroundColor="rgba(255,255,255,0.80)"
+        color="#7dd3fc"
       />
 
       <InfoCard
         icon="calendar-outline"
         title="Delivery Days"
-        value={deliveryDays}
-        backgroundColor="#fff6d8"
-        color="#eab308"
+        value={`${deliveryDays} days`}
+        backgroundColor="rgba(255,255,255,0.80)"
+        color="#0d9488"
       />
 
     </View>

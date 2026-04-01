@@ -1,19 +1,41 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { Image, Pressable, Text, TouchableOpacity, View, StyleSheet } from "react-native";
 
+// Android pr empty string ya invalid uri crash karta hai
+// isliye strictly check karo
+const getValidUri = (item: any): string | null => {
+    const raw = item.gigsFiles || item.gigsImage;
+    if (!raw || typeof raw !== 'string') return null;
+    const uri = raw.split(',')[0].trim();
+    if (!uri.startsWith('http')) return null;
+    return uri;
+};
+
 function GigCard2({ item }: any) {
+
+    const [imageError, setImageError] = useState(false);
+    const imageUri = getValidUri(item);
+    const showImage = !!imageUri && !imageError;
+
     return (
         <Pressable onPress={() => router.push(`/posted-gigs/${item.id}/edit-gig-overview`)}>
             <View style={styles.card}>
 
-                {/* Image */}
-                <Image
-                    source={{ uri: item.gigsFiles }}
-                    style={styles.cardImage}
-                    resizeMode="cover"
-                />
+                {/* Image ya Fallback */}
+                {showImage ? (
+                    <Image
+                        source={{ uri: imageUri! }}
+                        style={styles.cardImage}
+                        resizeMode="cover"
+                        onError={() => setImageError(true)}
+                    />
+                ) : (
+                    <View style={styles.avatarFallback}>
+                        <MaterialCommunityIcons name="image-off-outline" size={32} color="#94a3b8" />
+                    </View>
+                )}
 
                 {/* Content */}
                 <View style={styles.cardContent}>
@@ -60,14 +82,22 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: 'rgba(14,165,233,0.10)',
     },
-
     cardImage: {
         width: 90,
         height: 90,
         borderRadius: 12,
         backgroundColor: '#e2e8f0',
     },
-
+    avatarFallback: {
+        width: 90,
+        height: 90,
+        borderRadius: 12,
+        backgroundColor: '#f1f5f9',
+        borderWidth: 1,
+        borderColor: '#e2e8f0',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
     cardContent: {
         flex: 1,
         marginLeft: 12,
@@ -75,21 +105,18 @@ const styles = StyleSheet.create({
         gap: 6,
         paddingRight: 24,
     },
-
     menuBtn: {
         position: "absolute",
         right: 8,
         top: 8,
         padding: 4,
     },
-
     cardDesc: {
         fontSize: 14,
         color: '#0f172a',
         fontWeight: "700",
         lineHeight: 20,
     },
-
     tagRow: {
         flexDirection: 'row',
         gap: 6,
@@ -112,7 +139,6 @@ const styles = StyleSheet.create({
     tagTextSecondary: {
         color: '#0891b2',
     },
-
     typeText: {
         fontSize: 11,
         color: '#94a3b8',

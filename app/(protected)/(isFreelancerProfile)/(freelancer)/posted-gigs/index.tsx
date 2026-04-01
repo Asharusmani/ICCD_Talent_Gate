@@ -61,7 +61,7 @@ const List = () => {
                 <Text style={styles.heading}>My Gigs</Text>
               </View>
               <TouchableOpacity
-                onPress={() => router.push("/posted-gigs/add-gig/gig-description")}
+                onPress={() => router.push("/posted-gigs/add-gig/gig-overview")}
                 style={styles.addButton}
               >
                 <Plus size={16} color="#fff" />

@@ -1,6 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native';
 
-export default function OrderDescription({ description }) {
+interface OrderDescriptionProps {
+  description: string;
+}
+
+export default function OrderDescription({ description }: OrderDescriptionProps) {
   return (
     <View style={styles.wrapper}>
       <Text style={styles.title}>Description</Text>
@@ -18,14 +22,15 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 15,
     fontWeight: '600',
-    marginBottom: 8,
     color: '#0f172a',
     marginBottom: 25,
   },
   box: {
-    backgroundColor: '#eef2f3',
-    borderRadius: 10,
+    backgroundColor: 'rgba(255,255,255,0.80)',
+    borderRadius: 12,
     padding: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(14,165,233,0.15)',
   },
   text: {
     fontSize: 13,

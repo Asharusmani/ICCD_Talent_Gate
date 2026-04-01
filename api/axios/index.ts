@@ -8,7 +8,7 @@ const api = axios.create({
   // baseURL: "http://192.168.100.8:22306/",
 
   // Sohaib Phone
-  baseURL: "http://192.168.100.105:22306/",
+  baseURL: "http://192.168.18.97:22306/",
   // baseURL: "http://192.168.100.8:22306/",
 
   // Mohid Phone
