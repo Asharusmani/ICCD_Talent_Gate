@@ -3,7 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, View, TouchableOpacity, Text, FlatList, Alert } from 'react-native';
 
 const items = [
-  { icon: 'person-outline',       label: 'Edit Profile',   subtitle: 'Update your info',      route: '/edit-profile', color: '#15A9B2' },
+  { icon: 'person-outline',       label: 'Edit Profile',   subtitle: 'Update your info',      route: '/edit-Profiles/edit-Profiles', color: '#15A9B2' },
   { icon: 'headset-outline',      label: 'Support',        subtitle: 'Get help anytime',       route: '/support',      color: '#0891b2' },
   { icon: 'help-circle-outline',  label: 'FAQ',            subtitle: 'Common questions',       route: '/faq',          color: '#7c3aed' },
   { icon: 'share-social-outline', label: 'Invite Friends', subtitle: 'Share & earn rewards',   route: '/invite',       color: '#059669' },

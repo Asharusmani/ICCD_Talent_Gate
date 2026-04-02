@@ -2,7 +2,7 @@ import { useGetAllDisputeByFreelancer } from "@/api/client/dispute";
 import { DisputeCard } from '@/components/cards/dispute-card';
 import SearchBar from "@/components/ui/search-bar";
 import { useState } from 'react';
-import { FlatList, StyleSheet, Text } from 'react-native';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ICCDLoader from '@/components/ui/loader2';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -24,12 +24,14 @@ export default function Dispute() {
       end={{ x: 0.6, y: 1 }}
     >
       {/* <Header title="My Dispute" description="This is dispute description" /> */}
-      <SearchBar search={search} setSearch={setSearch} placeholder="Search Dispute..." />
+      <View style={{ paddingTop: insets.top + 80 }}>
+        <SearchBar search={search} setSearch={setSearch} placeholder="Search Dispute..." />
+      </View>
       <FlatList
         data={data}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => <DisputeCard item={item} />}
-        contentContainerStyle={[styles.listPadding, { paddingTop:  10 }]}
+        contentContainerStyle={[styles.listPadding, { paddingTop: 10 }]}
         showsVerticalScrollIndicator={false}
       />
     </LinearGradient>

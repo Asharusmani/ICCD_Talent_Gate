@@ -135,6 +135,7 @@ export default function ClientLayout() {
                 drawerItemStyle: { display: 'none' },
               }}
             />
+            
           </Drawer>
         </ThemeProvider>
       </GestureHandlerRootView>

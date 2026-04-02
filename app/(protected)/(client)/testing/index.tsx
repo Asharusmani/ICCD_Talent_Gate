@@ -3,7 +3,7 @@ import { View, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import TestStripeCheckout from '../../../../components/payment/TestStripeCheckout';
 import EditProfileScreen from "@/components/profile/edit-profile-form";
-import EditProfile from "@/app/(protected)/(client)/edit-profile/edit-profile";
+import EditProfile from "@/app/(protected)/(client)/edit-Profiles/edit-Profiles";
 
 
 function Testing() {
